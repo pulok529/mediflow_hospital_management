@@ -28,6 +28,11 @@ import { VitalsRecordingPage } from "@/pages/nursing/VitalsRecordingPage";
 import { NursingNoteEntryPage } from "@/pages/nursing/NursingNoteEntryPage";
 import { ShiftHandoverPage } from "@/pages/nursing/ShiftHandoverPage";
 import { TransferDischargePreparationPage } from "@/pages/nursing/TransferDischargePreparationPage";
+import { LabDashboardPage } from "@/pages/diagnostics/LabDashboardPage";
+import { SampleCollectionPage } from "@/pages/diagnostics/SampleCollectionPage";
+import { LabResultApprovalPage } from "@/pages/diagnostics/LabResultApprovalPage";
+import { RadiologyDashboardPage } from "@/pages/diagnostics/RadiologyDashboardPage";
+import { ImagingScheduleReportPage } from "@/pages/diagnostics/ImagingScheduleReportPage";
 
 export const router = createBrowserRouter([
   {
@@ -37,63 +42,13 @@ export const router = createBrowserRouter([
   {
     element: <AuthGuard />,
     children: [
-      {
-        path: "/",
-        element: <DashboardLayout />,
-        children: [
-          { index: true, element: <DashboardPage /> },
-          { path: "dashboard", element: <DashboardPage /> }
-        ]
-      },
-      {
-        element: <RoleGuard roles={["SuperAdmin", "Admin"]} />,
-        children: [
-          { path: "/admin/users", element: <UserManagementPage /> },
-          { path: "/admin/roles", element: <RoleManagementPage /> },
-          { path: "/admin/permissions", element: <PermissionAssignmentPage /> }
-        ]
-      },
-      {
-        element: <RoleGuard roles={["SuperAdmin", "Admin", "Receptionist"]} />,
-        children: [
-          { path: "/reception", element: <ReceptionDashboardPage /> },
-          { path: "/reception/register", element: <PatientRegistrationPage /> },
-          { path: "/reception/search", element: <PatientSearchPage /> },
-          { path: "/reception/book", element: <AppointmentBookingPage /> },
-          { path: "/reception/daily", element: <DailyAppointmentListPage /> },
-          { path: "/reception/queue", element: <QueueManagementPage /> }
-        ]
-      },
-      {
-        element: <RoleGuard roles={["SuperAdmin", "Admin", "Doctor"]} />,
-        children: [
-          { path: "/doctor", element: <DoctorDashboardPage /> },
-          { path: "/doctor/waiting", element: <WaitingPatientsPage /> },
-          { path: "/doctor/consultation", element: <ConsultationPage /> },
-          { path: "/doctor/history", element: <HistoryTimelinePage /> }
-        ]
-      },
-      {
-        element: <RoleGuard roles={["SuperAdmin", "Admin", "AdmissionOfficer", "FloorReceptionist"]} />,
-        children: [
-          { path: "/admission/wizard", element: <AdmissionDeskWizardPage /> },
-          { path: "/admission/config", element: <BedConfigurationPage /> },
-          { path: "/admission/bed-board", element: <BedBoardPage /> },
-          { path: "/admission/floor-reception", element: <FloorReceptionDashboardPage /> }
-        ]
-      },
-      {
-        element: <RoleGuard roles={["SuperAdmin", "Admin", "Nurse", "FloorReceptionist"]} />,
-        children: [
-          { path: "/nursing", element: <NurseStationDashboardPage /> },
-          { path: "/nursing/assigned", element: <AssignedPatientsPage /> },
-          { path: "/nursing/medications", element: <MedicationDueListPage /> },
-          { path: "/nursing/vitals", element: <VitalsRecordingPage /> },
-          { path: "/nursing/notes", element: <NursingNoteEntryPage /> },
-          { path: "/nursing/handover", element: <ShiftHandoverPage /> },
-          { path: "/nursing/transfer-discharge", element: <TransferDischargePreparationPage /> }
-        ]
-      }
+      { path: "/", element: <DashboardLayout />, children: [{ index: true, element: <DashboardPage /> }, { path: "dashboard", element: <DashboardPage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin"]} />, children: [{ path: "/admin/users", element: <UserManagementPage /> }, { path: "/admin/roles", element: <RoleManagementPage /> }, { path: "/admin/permissions", element: <PermissionAssignmentPage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin", "Receptionist"]} />, children: [{ path: "/reception", element: <ReceptionDashboardPage /> }, { path: "/reception/register", element: <PatientRegistrationPage /> }, { path: "/reception/search", element: <PatientSearchPage /> }, { path: "/reception/book", element: <AppointmentBookingPage /> }, { path: "/reception/daily", element: <DailyAppointmentListPage /> }, { path: "/reception/queue", element: <QueueManagementPage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin", "Doctor"]} />, children: [{ path: "/doctor", element: <DoctorDashboardPage /> }, { path: "/doctor/waiting", element: <WaitingPatientsPage /> }, { path: "/doctor/consultation", element: <ConsultationPage /> }, { path: "/doctor/history", element: <HistoryTimelinePage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin", "AdmissionOfficer", "FloorReceptionist"]} />, children: [{ path: "/admission/wizard", element: <AdmissionDeskWizardPage /> }, { path: "/admission/config", element: <BedConfigurationPage /> }, { path: "/admission/bed-board", element: <BedBoardPage /> }, { path: "/admission/floor-reception", element: <FloorReceptionDashboardPage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin", "Nurse", "FloorReceptionist"]} />, children: [{ path: "/nursing", element: <NurseStationDashboardPage /> }, { path: "/nursing/assigned", element: <AssignedPatientsPage /> }, { path: "/nursing/medications", element: <MedicationDueListPage /> }, { path: "/nursing/vitals", element: <VitalsRecordingPage /> }, { path: "/nursing/notes", element: <NursingNoteEntryPage /> }, { path: "/nursing/handover", element: <ShiftHandoverPage /> }, { path: "/nursing/transfer-discharge", element: <TransferDischargePreparationPage /> }] },
+      { element: <RoleGuard roles={["SuperAdmin", "Admin", "LabTech", "Doctor"]} />, children: [{ path: "/lab", element: <LabDashboardPage /> }, { path: "/lab/sample-collection", element: <SampleCollectionPage /> }, { path: "/lab/result-approval", element: <LabResultApprovalPage /> }, { path: "/radiology", element: <RadiologyDashboardPage /> }, { path: "/radiology/schedule-report", element: <ImagingScheduleReportPage /> }] }
     ]
   }
 ]);

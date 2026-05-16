@@ -111,3 +111,24 @@ export const nursingApi = {
   },
   transferDischarge: () => request<any[]>("/api/nursing/transfer-discharge")
 };
+
+export const diagnosticsApi = {
+  lab: {
+    catalog: () => request<any[]>("/api/diagnostics/lab/catalog"),
+    addCatalog: (body: any) => request<any>("/api/diagnostics/lab/catalog", { method: "POST", body: JSON.stringify(body) }),
+    orders: () => request<any[]>("/api/diagnostics/lab/orders"),
+    createOrder: (body: any) => request<any>("/api/diagnostics/lab/orders", { method: "POST", body: JSON.stringify(body) }),
+    collect: (id: string) => request<any>(`/api/diagnostics/lab/orders/${id}/collect`, { method: "PUT" }),
+    result: (id: string, body: any) => request<any>(`/api/diagnostics/lab/orders/${id}/result`, { method: "PUT", body: JSON.stringify(body) }),
+    approve: (id: string) => request<any>(`/api/diagnostics/lab/orders/${id}/approve`, { method: "PUT" })
+  },
+  imaging: {
+    catalog: () => request<any[]>("/api/diagnostics/imaging/catalog"),
+    addCatalog: (body: any) => request<any>("/api/diagnostics/imaging/catalog", { method: "POST", body: JSON.stringify(body) }),
+    orders: () => request<any[]>("/api/diagnostics/imaging/orders"),
+    createOrder: (body: any) => request<any>("/api/diagnostics/imaging/orders", { method: "POST", body: JSON.stringify(body) }),
+    schedule: (id: string, body: any) => request<any>(`/api/diagnostics/imaging/orders/${id}/schedule`, { method: "PUT", body: JSON.stringify(body) }),
+    report: (id: string, body: any) => request<any>(`/api/diagnostics/imaging/orders/${id}/report`, { method: "PUT", body: JSON.stringify(body) }),
+    approve: (id: string) => request<any>(`/api/diagnostics/imaging/orders/${id}/approve`, { method: "PUT" })
+  }
+};

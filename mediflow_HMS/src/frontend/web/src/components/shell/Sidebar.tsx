@@ -1,29 +1,10 @@
 ﻿const navItems = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "User Management", href: "/admin/users" },
-  { label: "Role Management", href: "/admin/roles" },
-  { label: "Permission Assignment", href: "/admin/permissions" },
-  { label: "Reception Dashboard", href: "/reception" },
-  { label: "Patient Registration", href: "/reception/register" },
-  { label: "Patient Search", href: "/reception/search" },
-  { label: "Appointment Booking", href: "/reception/book" },
-  { label: "Daily Appointments", href: "/reception/daily" },
-  { label: "Queue Management", href: "/reception/queue" },
-  { label: "Doctor Dashboard", href: "/doctor" },
-  { label: "Waiting Patients", href: "/doctor/waiting" },
-  { label: "Consultation", href: "/doctor/consultation" },
-  { label: "History Timeline", href: "/doctor/history" },
-  { label: "Admission Wizard", href: "/admission/wizard" },
-  { label: "Bed Configuration", href: "/admission/config" },
-  { label: "Live Bed Board", href: "/admission/bed-board" },
-  { label: "Floor Reception", href: "/admission/floor-reception" },
-  { label: "Nurse Dashboard", href: "/nursing" },
-  { label: "Assigned Patients", href: "/nursing/assigned" },
-  { label: "Medication Due", href: "/nursing/medications" },
-  { label: "Vitals Recording", href: "/nursing/vitals" },
-  { label: "Nursing Notes", href: "/nursing/notes" },
-  { label: "Shift Handover", href: "/nursing/handover" },
-  { label: "Transfer/Discharge", href: "/nursing/transfer-discharge" }
+  { label: "Lab Dashboard", href: "/lab" },
+  { label: "Sample Collection", href: "/lab/sample-collection" },
+  { label: "Lab Result Approval", href: "/lab/result-approval" },
+  { label: "Radiology Dashboard", href: "/radiology" },
+  { label: "Imaging Schedule", href: "/radiology/schedule-report" }
 ];
 
 export function Sidebar() {
