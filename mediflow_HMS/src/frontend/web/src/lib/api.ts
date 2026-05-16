@@ -154,3 +154,19 @@ export const pharmacyApi = {
   issueDept: (body: any) => request<any>("/api/pharmacy/issue/department", { method: "POST", body: JSON.stringify(body) }),
   movements: () => request<any[]>("/api/pharmacy/stock-movements")
 };
+
+export const billingApi = {
+  dashboard: () => request<any>("/api/billing/dashboard"),
+  bills: () => request<any[]>("/api/billing/bills"),
+  bill: (id: string) => request<any>(`/api/billing/bills/${id}`),
+  createOpd: (body: any) => request<any>("/api/billing/opd", { method: "POST", body: JSON.stringify(body) }),
+  createIpd: (body: any) => request<any>("/api/billing/ipd", { method: "POST", body: JSON.stringify(body) }),
+  addRunningLine: (body: any) => request<any>("/api/billing/running-line", { method: "PUT", body: JSON.stringify(body) }),
+  addPayment: (body: any) => request<any>("/api/billing/payments", { method: "POST", body: JSON.stringify(body) }),
+  requestDiscount: (body: any) => request<any>("/api/billing/discount/request", { method: "POST", body: JSON.stringify(body) }),
+  discountQueue: () => request<any[]>("/api/billing/discount-queue"),
+  resolveDiscount: (id: string, status: string) => request<any>(`/api/billing/discount/${id}/resolve`, { method: "PUT", body: JSON.stringify({ status }) }),
+  refund: (body: any) => request<any>("/api/billing/refunds", { method: "POST", body: JSON.stringify(body) }),
+  finalClearance: (body: any) => request<any>("/api/billing/final-clearance", { method: "POST", body: JSON.stringify(body) }),
+  saveDischarge: (body: any) => request<any>("/api/billing/discharge-summary", { method: "POST", body: JSON.stringify(body) })
+};

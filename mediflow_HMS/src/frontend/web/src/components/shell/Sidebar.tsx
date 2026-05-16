@@ -1,10 +1,12 @@
 ﻿const navItems = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Pharmacy Dashboard", href: "/pharmacy" },
-  { label: "Prescription Dispense", href: "/pharmacy/dispense" },
-  { label: "Stock / Batch", href: "/pharmacy/stock" },
-  { label: "Inventory Dashboard", href: "/inventory" },
-  { label: "Purchase & Issue", href: "/inventory/purchase-issue" }
+  { label: "Billing Dashboard", href: "/billing" },
+  { label: "Running Bill", href: "/billing/running" },
+  { label: "Payment Entry", href: "/billing/payments" },
+  { label: "Refunds", href: "/billing/refunds" },
+  { label: "Discount Queue", href: "/billing/discounts" },
+  { label: "Discharge Checklist", href: "/billing/discharge-checklist" },
+  { label: "Final Clearance", href: "/billing/final-clearance" }
 ];
 
 export function Sidebar() {

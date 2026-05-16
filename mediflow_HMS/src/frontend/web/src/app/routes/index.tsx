@@ -4,11 +4,13 @@ import { DashboardLayout } from "@/app/layouts/DashboardLayout";
 import { AuthGuard, GuestGuard, RoleGuard } from "@/app/routes/guards";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { LoginPage } from "@/pages/LoginPage";
-import { PharmacyDashboardPage } from "@/pages/pharmacy/PharmacyDashboardPage";
-import { PrescriptionDispensingPage } from "@/pages/pharmacy/PrescriptionDispensingPage";
-import { StockBatchViewPage } from "@/pages/pharmacy/StockBatchViewPage";
-import { InventoryDashboardPage } from "@/pages/pharmacy/InventoryDashboardPage";
-import { PurchaseStockIssuePage } from "@/pages/pharmacy/PurchaseStockIssuePage";
+import { BillingDashboardPage } from "@/pages/billing/BillingDashboardPage";
+import { RunningBillViewPage } from "@/pages/billing/RunningBillViewPage";
+import { PaymentEntryPage } from "@/pages/billing/PaymentEntryPage";
+import { RefundScreenPage } from "@/pages/billing/RefundScreenPage";
+import { DiscountApprovalQueuePage } from "@/pages/billing/DiscountApprovalQueuePage";
+import { DischargeChecklistPage } from "@/pages/billing/DischargeChecklistPage";
+import { FinalBillClearancePage } from "@/pages/billing/FinalBillClearancePage";
 
 export const router = createBrowserRouter([
   { element: <GuestGuard />, children: [{ path: "/auth", element: <AuthLayout />, children: [{ path: "login", element: <LoginPage /> }] }] },
@@ -17,13 +19,15 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <DashboardLayout />, children: [{ index: true, element: <DashboardPage /> }, { path: "dashboard", element: <DashboardPage /> }] },
       {
-        element: <RoleGuard roles={["SuperAdmin", "Admin", "Pharmacist"]} />,
+        element: <RoleGuard roles={["SuperAdmin", "Admin", "BillingOfficer"]} />,
         children: [
-          { path: "/pharmacy", element: <PharmacyDashboardPage /> },
-          { path: "/pharmacy/dispense", element: <PrescriptionDispensingPage /> },
-          { path: "/pharmacy/stock", element: <StockBatchViewPage /> },
-          { path: "/inventory", element: <InventoryDashboardPage /> },
-          { path: "/inventory/purchase-issue", element: <PurchaseStockIssuePage /> }
+          { path: "/billing", element: <BillingDashboardPage /> },
+          { path: "/billing/running", element: <RunningBillViewPage /> },
+          { path: "/billing/payments", element: <PaymentEntryPage /> },
+          { path: "/billing/refunds", element: <RefundScreenPage /> },
+          { path: "/billing/discounts", element: <DiscountApprovalQueuePage /> },
+          { path: "/billing/discharge-checklist", element: <DischargeChecklistPage /> },
+          { path: "/billing/final-clearance", element: <FinalBillClearancePage /> }
         ]
       }
     ]

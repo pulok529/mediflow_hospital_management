@@ -1,6 +1,7 @@
 ﻿using Mediflow.Application.Abstractions.Admission;
 using Mediflow.Application.Abstractions.Audit;
 using Mediflow.Application.Abstractions.Auth;
+using Mediflow.Application.Abstractions.Billing;
 using Mediflow.Application.Abstractions.Consultation;
 using Mediflow.Application.Abstractions.Diagnostics;
 using Mediflow.Application.Abstractions.Nursing;
@@ -9,6 +10,7 @@ using Mediflow.Application.Abstractions.Pharmacy;
 using Mediflow.Infrastructure.Admission;
 using Mediflow.Infrastructure.Audit;
 using Mediflow.Infrastructure.Auth;
+using Mediflow.Infrastructure.Billing;
 using Mediflow.Infrastructure.Consultation;
 using Mediflow.Infrastructure.Diagnostics;
 using Mediflow.Infrastructure.Identity;
@@ -32,6 +34,7 @@ public static class DependencyInjection
         services.AddSingleton<INursingWorkflowService, InMemoryNursingWorkflowService>();
         services.AddSingleton<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
         services.AddSingleton<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
+        services.AddSingleton<IBillingWorkflowService, InMemoryBillingWorkflowService>();
         return services;
     }
 }
