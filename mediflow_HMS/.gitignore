@@ -1,4 +1,4 @@
-﻿# Global
+# Global
 .DS_Store
 Thumbs.db
 
@@ -21,6 +21,9 @@ obj/
 .env
 .env.*
 !.env.example
+!.env.dev.example
+!.env.staging.example
+!.env.prod.example
 
 # Logs
 logs/

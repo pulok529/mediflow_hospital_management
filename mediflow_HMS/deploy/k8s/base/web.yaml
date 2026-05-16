@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mediflow-web
+  labels:
+    app: mediflow-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mediflow-web
+  template:
+    metadata:
+      labels:
+        app: mediflow-web
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/pulok529/mediflow_hospital_management/web:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediflow-web
+spec:
+  selector:
+    app: mediflow-web
+  ports:
+    - port: 80
+      targetPort: 80

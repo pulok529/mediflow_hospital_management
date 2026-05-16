@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mediflow-staging
+resources:
+  - ../../base
+patches:
+  - path: replicas.yaml
+secretGenerator:
+  - name: mediflow-api-secrets
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - Jwt__Secret=replace-with-staging-secret
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=MediflowDb;User Id=sa;Password=replace-staging-sql-password;TrustServerCertificate=True
+generatorOptions:
+  disableNameSuffixHash: true

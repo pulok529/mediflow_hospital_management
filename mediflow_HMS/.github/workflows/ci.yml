@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build backend
+        run: |
+          dotnet restore src/backend/Mediflow.Api/Mediflow.Api.csproj
+          dotnet build src/backend/Mediflow.Api/Mediflow.Api.csproj -c Release --no-restore
+      - name: Build frontend
+        working-directory: src/frontend/web
+        run: |
+          npm ci
+          npm run build
+      - name: Docker build api
+        run: docker build -f src/backend/Mediflow.Api/Dockerfile -t mediflow-api:ci src/backend
+      - name: Docker build web
+        run: docker build -f src/frontend/web/Dockerfile -t mediflow-web:ci src/frontend/web

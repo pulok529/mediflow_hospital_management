@@ -40,3 +40,15 @@ This folder contains the initial production-grade foundation for Mediflow Hospit
 - Auth baseline and route guards are included.
 - Role/permission/user domain skeleton is included.
 - Business modules are intentionally deferred for next prompts.
+
+## Deployment and Ops Readiness
+- Development compose: `docker compose --env-file .env.dev.example up --build`
+- Staging compose: `docker compose -f docker-compose.staging.yml --env-file .env.staging up --build -d`
+- Reverse proxy config: `deploy/nginx/nginx.conf`
+- Kubernetes base and overlays: `deploy/k8s/base`, `deploy/k8s/overlays/staging`, `deploy/k8s/overlays/production`
+- CI/CD examples: `.github/workflows/ci.yml`, `.github/workflows/cd-example.yml`
+- Deployment docs:
+  - `docs/deployment/environment-strategy.md`
+  - `docs/deployment/production-configuration.md`
+  - `docs/deployment/logging-monitoring.md`
+  - `docs/deployment/secret-management.md`
