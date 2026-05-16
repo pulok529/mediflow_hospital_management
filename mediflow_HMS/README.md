@@ -60,3 +60,7 @@ This folder contains the initial production-grade foundation for Mediflow Hospit
 - Contract and safety docs:
   - `docs/deployment/ai-contracts.md`
   - `docs/deployment/ai-integration.md`
+
+## UAT and Final Refinement
+- UAT package: `docs/uat/README.md`
+- Performance and concurrency notes: `docs/performance_review.md`

@@ -15,7 +15,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   const res = await fetch(`${apiBaseUrl}${path}`, { ...init, headers });
   if (!res.ok) {
-    throw new Error(await res.text());
+    const body = await res.text();
+    const message = body?.trim()
+      ? body
+      : res.status === 400
+        ? "Validation failed. Please check your input and try again."
+        : res.status === 401
+          ? "Session expired or unauthorized. Please sign in again."
+          : res.status === 404
+            ? "Requested resource was not found."
+            : "Unexpected error while processing the request.";
+    throw new Error(message);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
