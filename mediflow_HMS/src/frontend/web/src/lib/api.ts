@@ -132,3 +132,25 @@ export const diagnosticsApi = {
     approve: (id: string) => request<any>(`/api/diagnostics/imaging/orders/${id}/approve`, { method: "PUT" })
   }
 };
+
+export const pharmacyApi = {
+  dashboard: () => request<any>("/api/pharmacy/dashboard"),
+  medicines: () => request<any[]>("/api/pharmacy/medicines"),
+  addMedicine: (body: any) => request<any>("/api/pharmacy/medicines", { method: "POST", body: JSON.stringify(body) }),
+  batches: () => request<any[]>("/api/pharmacy/batches"),
+  addBatch: (body: any) => request<any>("/api/pharmacy/batches", { method: "POST", body: JSON.stringify(body) }),
+  opdDispense: (body: any) => request<any>("/api/pharmacy/dispense/opd", { method: "POST", body: JSON.stringify(body) }),
+  ipdIssue: (body: any) => request<any>("/api/pharmacy/issue/ipd", { method: "POST", body: JSON.stringify(body) }),
+  returns: (body: any) => request<any>("/api/pharmacy/returns", { method: "POST", body: JSON.stringify(body) }),
+  lowStock: () => request<any[]>("/api/pharmacy/low-stock-alerts"),
+  suppliers: () => request<any[]>("/api/pharmacy/suppliers"),
+  addSupplier: (body: any) => request<any>("/api/pharmacy/suppliers", { method: "POST", body: JSON.stringify(body) }),
+  createPr: (body: any) => request<any>("/api/pharmacy/purchase-requests", { method: "POST", body: JSON.stringify(body) }),
+  prs: () => request<any[]>("/api/pharmacy/purchase-requests"),
+  createPo: (body: any) => request<any>("/api/pharmacy/purchase-orders", { method: "POST", body: JSON.stringify(body) }),
+  pos: () => request<any[]>("/api/pharmacy/purchase-orders"),
+  receive: (body: any) => request<any>("/api/pharmacy/goods-receive", { method: "POST", body: JSON.stringify(body) }),
+  grns: () => request<any[]>("/api/pharmacy/goods-receive"),
+  issueDept: (body: any) => request<any>("/api/pharmacy/issue/department", { method: "POST", body: JSON.stringify(body) }),
+  movements: () => request<any[]>("/api/pharmacy/stock-movements")
+};

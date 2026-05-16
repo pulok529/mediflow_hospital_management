@@ -1,10 +1,10 @@
 ﻿const navItems = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Lab Dashboard", href: "/lab" },
-  { label: "Sample Collection", href: "/lab/sample-collection" },
-  { label: "Lab Result Approval", href: "/lab/result-approval" },
-  { label: "Radiology Dashboard", href: "/radiology" },
-  { label: "Imaging Schedule", href: "/radiology/schedule-report" }
+  { label: "Pharmacy Dashboard", href: "/pharmacy" },
+  { label: "Prescription Dispense", href: "/pharmacy/dispense" },
+  { label: "Stock / Batch", href: "/pharmacy/stock" },
+  { label: "Inventory Dashboard", href: "/inventory" },
+  { label: "Purchase & Issue", href: "/inventory/purchase-issue" }
 ];
 
 export function Sidebar() {
