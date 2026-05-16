@@ -49,3 +49,18 @@ export const api = {
     list: () => request<any[]>("/api/audit-logs")
   }
 };
+
+export const workflowApi = {
+  patients: {
+    create: (body: any) => request<any>("/api/patients", { method: "POST", body: JSON.stringify(body) }),
+    search: (params: URLSearchParams) => request<any[]>(`/api/patients/search?${params.toString()}`)
+  },
+  appointments: {
+    create: (body: any) => request<any>("/api/appointments", { method: "POST", body: JSON.stringify(body) }),
+    daily: (date: string) => request<any[]>(`/api/appointments/daily?date=${date}`)
+  },
+  queue: {
+    list: (date: string) => request<any[]>(`/api/queue?date=${date}`),
+    updateState: (id: string, state: string) => request<any>(`/api/queue/${id}/state`, { method: "PUT", body: JSON.stringify({ state }) })
+  }
+};

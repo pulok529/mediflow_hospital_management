@@ -1,9 +1,10 @@
-﻿using Mediflow.Application.Abstractions.Auth;
+﻿using Mediflow.Application.Abstractions.Audit;
+using Mediflow.Application.Abstractions.Auth;
 using Mediflow.Domain.Identity;
 
 namespace Mediflow.Infrastructure.Identity;
 
-internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIdentityService
+internal sealed class InMemoryIdentityService(ITokenService tokenService, IAuditLogService auditLogService) : IIdentityService
 {
     private static readonly object Sync = new();
     private static readonly List<string> PermissionCatalog =
@@ -14,7 +15,6 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
     private static readonly List<Role> Roles = [];
     private static readonly List<User> Users = [];
     private static readonly List<RefreshToken> RefreshTokens = [];
-    private static readonly List<AuditLog> AuditLogs = [];
 
     static InMemoryIdentityService()
     {
@@ -54,9 +54,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
         {
             var user = Users.FirstOrDefault(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && x.IsActive);
             if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            {
                 throw new InvalidOperationException("Invalid credentials.");
-            }
 
             var permissions = user.Roles.SelectMany(r => r.Permissions.Select(p => p.Code)).Distinct().ToArray();
             var roles = user.Roles.Select(r => r.Name).ToArray();
@@ -64,13 +62,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var refreshExpiry = DateTime.UtcNow.AddDays(7);
             var refreshTokenValue = Convert.ToBase64String(Guid.NewGuid().ToByteArray()) + Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
-            RefreshTokens.Add(new RefreshToken
-            {
-                UserId = user.Id,
-                Token = refreshTokenValue,
-                ExpiresAtUtc = refreshExpiry,
-                Revoked = false
-            });
+            RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refreshTokenValue, ExpiresAtUtc = refreshExpiry, Revoked = false });
 
             return new AuthTokens(tokenService.CreateToken(user.Id, user.Email, permissions, roles), refreshTokenValue, accessExpiry, refreshExpiry);
         }
@@ -91,34 +83,13 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var refreshExpiry = DateTime.UtcNow.AddDays(7);
             var newRefreshTokenValue = Convert.ToBase64String(Guid.NewGuid().ToByteArray()) + Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
-            RefreshTokens.Add(new RefreshToken
-            {
-                UserId = user.Id,
-                Token = newRefreshTokenValue,
-                ExpiresAtUtc = refreshExpiry,
-                Revoked = false
-            });
-
+            RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = newRefreshTokenValue, ExpiresAtUtc = refreshExpiry, Revoked = false });
             return new AuthTokens(tokenService.CreateToken(user.Id, user.Email, permissions, roles), newRefreshTokenValue, accessExpiry, refreshExpiry);
         }
     }
 
-    public IReadOnlyCollection<UserDto> GetUsers()
-    {
-        lock (Sync)
-        {
-            return Users.Select(MapUser).ToArray();
-        }
-    }
-
-    public UserDto? GetUser(Guid userId)
-    {
-        lock (Sync)
-        {
-            var user = Users.FirstOrDefault(x => x.Id == userId);
-            return user is null ? null : MapUser(user);
-        }
-    }
+    public IReadOnlyCollection<UserDto> GetUsers() { lock (Sync) return Users.Select(MapUser).ToArray(); }
+    public UserDto? GetUser(Guid userId) { lock (Sync) { var user = Users.FirstOrDefault(x => x.Id == userId); return user is null ? null : MapUser(user); } }
 
     public UserDto CreateUser(CreateUserRequest request, Guid? actorUserId)
     {
@@ -130,7 +101,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var user = new User(request.Email, BCrypt.Net.BCrypt.HashPassword(request.Password));
             ApplyRoles(user, request.Roles);
             Users.Add(user);
-            AddAudit(actorUserId, "User.Create", "User", user.Id.ToString(), $"Created user {user.Email}");
+            auditLogService.Add(actorUserId, "User.Create", "User", user.Id.ToString(), $"Created user {user.Email}");
             return MapUser(user);
         }
     }
@@ -144,7 +115,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
 
             user.UpdateProfile(request.Email, request.IsActive);
             ApplyRoles(user, request.Roles);
-            AddAudit(actorUserId, "User.Update", "User", user.Id.ToString(), $"Updated user {user.Email}");
+            auditLogService.Add(actorUserId, "User.Update", "User", user.Id.ToString(), $"Updated user {user.Email}");
             return MapUser(user);
         }
     }
@@ -156,18 +127,12 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var user = Users.FirstOrDefault(x => x.Id == userId);
             if (user is null) return false;
             Users.Remove(user);
-            AddAudit(actorUserId, "User.Delete", "User", user.Id.ToString(), $"Deleted user {user.Email}");
+            auditLogService.Add(actorUserId, "User.Delete", "User", user.Id.ToString(), $"Deleted user {user.Email}");
             return true;
         }
     }
 
-    public IReadOnlyCollection<RoleDto> GetRoles()
-    {
-        lock (Sync)
-        {
-            return Roles.Select(MapRole).ToArray();
-        }
-    }
+    public IReadOnlyCollection<RoleDto> GetRoles() { lock (Sync) return Roles.Select(MapRole).ToArray(); }
 
     public RoleDto CreateRole(CreateRoleRequest request, Guid? actorUserId)
     {
@@ -178,7 +143,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
 
             var role = new Role(request.Name);
             Roles.Add(role);
-            AddAudit(actorUserId, "Role.Create", "Role", role.Id.ToString(), $"Created role {role.Name}");
+            auditLogService.Add(actorUserId, "Role.Create", "Role", role.Id.ToString(), $"Created role {role.Name}");
             return MapRole(role);
         }
     }
@@ -190,7 +155,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var role = Roles.FirstOrDefault(x => x.Id == roleId);
             if (role is null) return null;
             role.Rename(request.Name);
-            AddAudit(actorUserId, "Role.Update", "Role", role.Id.ToString(), $"Updated role {role.Name}");
+            auditLogService.Add(actorUserId, "Role.Update", "Role", role.Id.ToString(), $"Updated role {role.Name}");
             return MapRole(role);
         }
     }
@@ -202,11 +167,8 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var role = Roles.FirstOrDefault(x => x.Id == roleId);
             if (role is null) return false;
             Roles.Remove(role);
-            foreach (var user in Users)
-            {
-                user.Roles.RemoveAll(r => r.Id == roleId);
-            }
-            AddAudit(actorUserId, "Role.Delete", "Role", roleId.ToString(), "Deleted role");
+            foreach (var user in Users) user.Roles.RemoveAll(r => r.Id == roleId);
+            auditLogService.Add(actorUserId, "Role.Delete", "Role", roleId.ToString(), "Deleted role");
             return true;
         }
     }
@@ -223,22 +185,12 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
             var validPermissions = request.Permissions.Where(PermissionCatalog.Contains).Distinct().ToArray();
             role.Permissions.Clear();
             role.Permissions.AddRange(validPermissions.Select(Permission.Of));
-            AddAudit(actorUserId, "Permission.Assign", "Role", role.Id.ToString(), $"Assigned permissions to {role.Name}");
+            auditLogService.Add(actorUserId, "Permission.Assign", "Role", role.Id.ToString(), $"Assigned permissions to {role.Name}");
             return MapRole(role);
         }
     }
 
-    public IReadOnlyCollection<AuditLogDto> GetAuditLogs()
-    {
-        lock (Sync)
-        {
-            return AuditLogs
-                .OrderByDescending(x => x.AtUtc)
-                .Take(200)
-                .Select(x => new AuditLogDto(x.Id, x.ActorUserId, x.Action, x.EntityType, x.EntityId, x.AtUtc, x.Details))
-                .ToArray();
-        }
-    }
+    public IReadOnlyCollection<AuditLogDto> GetAuditLogs() => auditLogService.GetLatest();
 
     private static void ApplyRoles(User user, IReadOnlyCollection<string> roleNames)
     {
@@ -257,17 +209,4 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService) : IIde
         var permissions = user.Roles.SelectMany(r => r.Permissions.Select(p => p.Code)).Distinct().ToArray();
         return new UserDto(user.Id, user.Email, user.IsActive, user.Roles.Select(r => r.Name).ToArray(), permissions);
     }
-
-    private static void AddAudit(Guid? actorUserId, string action, string entityType, string entityId, string details)
-    {
-        AuditLogs.Add(new AuditLog
-        {
-            ActorUserId = actorUserId,
-            Action = action,
-            EntityType = entityType,
-            EntityId = entityId,
-            Details = details
-        });
-    }
 }
-
