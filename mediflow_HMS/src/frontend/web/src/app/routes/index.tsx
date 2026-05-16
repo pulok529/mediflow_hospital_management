@@ -13,6 +13,10 @@ import { PatientSearchPage } from "@/pages/reception/PatientSearchPage";
 import { AppointmentBookingPage } from "@/pages/reception/AppointmentBookingPage";
 import { DailyAppointmentListPage } from "@/pages/reception/DailyAppointmentListPage";
 import { QueueManagementPage } from "@/pages/reception/QueueManagementPage";
+import { DoctorDashboardPage } from "@/pages/doctor/DoctorDashboardPage";
+import { WaitingPatientsPage } from "@/pages/doctor/WaitingPatientsPage";
+import { ConsultationPage } from "@/pages/doctor/ConsultationPage";
+import { HistoryTimelinePage } from "@/pages/doctor/HistoryTimelinePage";
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +51,15 @@ export const router = createBrowserRouter([
           { path: "/reception/book", element: <AppointmentBookingPage /> },
           { path: "/reception/daily", element: <DailyAppointmentListPage /> },
           { path: "/reception/queue", element: <QueueManagementPage /> }
+        ]
+      },
+      {
+        element: <RoleGuard roles={["SuperAdmin", "Admin", "Doctor"]} />,
+        children: [
+          { path: "/doctor", element: <DoctorDashboardPage /> },
+          { path: "/doctor/waiting", element: <WaitingPatientsPage /> },
+          { path: "/doctor/consultation", element: <ConsultationPage /> },
+          { path: "/doctor/history", element: <HistoryTimelinePage /> }
         ]
       }
     ]

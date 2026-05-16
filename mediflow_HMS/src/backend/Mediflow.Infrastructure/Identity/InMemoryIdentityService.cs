@@ -9,7 +9,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService, IAudit
     private static readonly object Sync = new();
     private static readonly List<string> PermissionCatalog =
     [
-        "Patient.View", "Patient.Create", "Appointment.Create", "Billing.Refund", "Bed.Assign", "Discharge.Approve"
+        "Patient.View", "Patient.Create", "Appointment.Create", "Billing.Refund", "Bed.Assign", "Discharge.Approve", "Consultation.Manage"
     ];
 
     private static readonly List<Role> Roles = [];
@@ -32,6 +32,11 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService, IAudit
             if (roleName is "SuperAdmin" or "Admin")
             {
                 role.Permissions.AddRange(PermissionCatalog.Select(Permission.Of));
+            }
+            else if (roleName == "Doctor")
+            {
+                role.Permissions.Add(Permission.Of("Patient.View"));
+                role.Permissions.Add(Permission.Of("Consultation.Manage"));
             }
             else if (roleName == "Receptionist")
             {
@@ -63,7 +68,6 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService, IAudit
             var refreshTokenValue = Convert.ToBase64String(Guid.NewGuid().ToByteArray()) + Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
             RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refreshTokenValue, ExpiresAtUtc = refreshExpiry, Revoked = false });
-
             return new AuthTokens(tokenService.CreateToken(user.Id, user.Email, permissions, roles), refreshTokenValue, accessExpiry, refreshExpiry);
         }
     }

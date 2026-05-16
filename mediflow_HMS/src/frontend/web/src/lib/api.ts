@@ -64,3 +64,10 @@ export const workflowApi = {
     updateState: (id: string, state: string) => request<any>(`/api/queue/${id}/state`, { method: "PUT", body: JSON.stringify({ state }) })
   }
 };
+
+export const consultationApi = {
+  start: (body: any) => request<any>("/api/consultations/start", { method: "POST", body: JSON.stringify(body) }),
+  save: (encounterId: string, body: any) => request<any>(`/api/consultations/${encounterId}`, { method: "PUT", body: JSON.stringify(body) }),
+  waiting: (date: string) => request<any[]>(`/api/consultations/waiting?date=${date}`),
+  history: (patientId: string) => request<any[]>(`/api/consultations/history/${patientId}`)
+};

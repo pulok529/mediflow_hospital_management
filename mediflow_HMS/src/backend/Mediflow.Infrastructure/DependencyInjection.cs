@@ -1,8 +1,10 @@
 ﻿using Mediflow.Application.Abstractions.Audit;
 using Mediflow.Application.Abstractions.Auth;
+using Mediflow.Application.Abstractions.Consultation;
 using Mediflow.Application.Abstractions.Patient;
 using Mediflow.Infrastructure.Audit;
 using Mediflow.Infrastructure.Auth;
+using Mediflow.Infrastructure.Consultation;
 using Mediflow.Infrastructure.Identity;
 using Mediflow.Infrastructure.Patient;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddSingleton<IIdentityService, InMemoryIdentityService>();
         services.AddSingleton<IPatientWorkflowService, InMemoryPatientWorkflowService>();
+        services.AddSingleton<IConsultationWorkflowService, InMemoryConsultationWorkflowService>();
         return services;
     }
 }
