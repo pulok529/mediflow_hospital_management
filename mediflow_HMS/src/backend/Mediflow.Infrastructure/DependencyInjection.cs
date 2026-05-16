@@ -7,6 +7,7 @@ using Mediflow.Application.Abstractions.Diagnostics;
 using Mediflow.Application.Abstractions.Nursing;
 using Mediflow.Application.Abstractions.Patient;
 using Mediflow.Application.Abstractions.Pharmacy;
+using Mediflow.Application.Abstractions.Reporting;
 using Mediflow.Infrastructure.Admission;
 using Mediflow.Infrastructure.Audit;
 using Mediflow.Infrastructure.Auth;
@@ -17,6 +18,7 @@ using Mediflow.Infrastructure.Identity;
 using Mediflow.Infrastructure.Nursing;
 using Mediflow.Infrastructure.Patient;
 using Mediflow.Infrastructure.Pharmacy;
+using Mediflow.Infrastructure.Reporting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediflow.Infrastructure;
@@ -35,6 +37,8 @@ public static class DependencyInjection
         services.AddSingleton<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
         services.AddSingleton<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
         services.AddSingleton<IBillingWorkflowService, InMemoryBillingWorkflowService>();
+        services.AddSingleton<IReportingService, InMemoryReportingService>();
+        services.AddSingleton<IExternalReportBridge, ExternalReportBridge>();
         return services;
     }
 }

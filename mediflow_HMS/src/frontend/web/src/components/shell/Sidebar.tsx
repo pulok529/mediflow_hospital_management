@@ -1,12 +1,8 @@
 ﻿const navItems = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Billing Dashboard", href: "/billing" },
-  { label: "Running Bill", href: "/billing/running" },
-  { label: "Payment Entry", href: "/billing/payments" },
-  { label: "Refunds", href: "/billing/refunds" },
-  { label: "Discount Queue", href: "/billing/discounts" },
-  { label: "Discharge Checklist", href: "/billing/discharge-checklist" },
-  { label: "Final Clearance", href: "/billing/final-clearance" }
+  { label: "Role Dashboards", href: "/reporting/roles" },
+  { label: "Report Center", href: "/reporting/center" },
+  { label: "Audit Explorer", href: "/reporting/audit" }
 ];
 
 export function Sidebar() {

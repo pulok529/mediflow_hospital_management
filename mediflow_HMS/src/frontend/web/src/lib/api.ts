@@ -170,3 +170,19 @@ export const billingApi = {
   finalClearance: (body: any) => request<any>("/api/billing/final-clearance", { method: "POST", body: JSON.stringify(body) }),
   saveDischarge: (body: any) => request<any>("/api/billing/discharge-summary", { method: "POST", body: JSON.stringify(body) })
 };
+
+export const reportingApi = {
+  dashboard: (role: string) => request<any>(`/api/reporting/dashboard/${role}`),
+  datasets: (body: any) => request<any[]>("/api/reporting/datasets", { method: "POST", body: JSON.stringify(body) }),
+  auditLogs: () => request<any[]>("/api/reporting/audit-logs"),
+  printable: async (body: any) => {
+    const token = localStorage.getItem("mf_token");
+    const res = await fetch("http://localhost:8080/api/reporting/printable", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return await res.blob();
+  }
+};
