@@ -33,6 +33,12 @@ builder.Services
     .AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
 
 builder.Services.AddInfrastructure();
+builder.Services.AddHttpClient("ai-service", client =>
+{
+    var baseUrl = builder.Configuration["AiService:BaseUrl"] ?? "http://localhost:8090";
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(20);
+});
 builder.Services.AddSingleton<INotificationPublisher, HubNotificationPublisher>();
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer();

@@ -33,11 +33,13 @@ services:
       Jwt__Audience: mediflow.web
       Jwt__Secret: ${JWT_SECRET}
       Redis__ConnectionString: redis:6379
+      AiService__BaseUrl: http://ai-service:8090
     expose:
       - "8080"
     depends_on:
       - sqlserver
       - redis
+      - ai-service
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -49,6 +51,13 @@ services:
 
   redis:
     image: redis:7-alpine
+
+  ai-service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    expose:
+      - "8090"
 
 volumes:
   sql_data:

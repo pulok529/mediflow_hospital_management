@@ -186,3 +186,11 @@ export const reportingApi = {
     return await res.blob();
   }
 };
+
+export const aiApi = {
+  createDraft: (body: any) => request<any>("/api/ai/drafts", { method: "POST", body: JSON.stringify(body) }),
+  listDrafts: () => request<any[]>("/api/ai/drafts"),
+  detail: (id: string) => request<any>(`/api/ai/drafts/${id}`),
+  reviewDraft: (id: string, approved: boolean, reviewerNotes?: string) =>
+    request<any>(`/api/ai/drafts/${id}/review`, { method: "POST", body: JSON.stringify({ approved, reviewerNotes }) })
+};

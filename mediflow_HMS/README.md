@@ -52,3 +52,11 @@ This folder contains the initial production-grade foundation for Mediflow Hospit
   - `docs/deployment/production-configuration.md`
   - `docs/deployment/logging-monitoring.md`
   - `docs/deployment/secret-management.md`
+
+## AI Last Phase Integration
+- Separate Python FastAPI service: `ai_service`
+- ASP.NET AI orchestration endpoints: `/api/ai/*`
+- Frontend AI review panel: `/ai/assistant`
+- Contract and safety docs:
+  - `docs/deployment/ai-contracts.md`
+  - `docs/deployment/ai-integration.md`

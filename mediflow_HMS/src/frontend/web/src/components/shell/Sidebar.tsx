@@ -1,5 +1,6 @@
-﻿const navItems = [
+const navItems = [
   { label: "Dashboard", href: "/dashboard" },
+  { label: "AI Assistant", href: "/ai/assistant" },
   { label: "Role Dashboards", href: "/reporting/roles" },
   { label: "Report Center", href: "/reporting/center" },
   { label: "Audit Explorer", href: "/reporting/audit" }

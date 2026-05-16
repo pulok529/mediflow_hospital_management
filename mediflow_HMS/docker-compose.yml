@@ -10,11 +10,13 @@ services:
       Jwt__Issuer: mediflow.api
       Jwt__Audience: mediflow.web
       Jwt__Secret: ${JWT_SECRET}
+      AiService__BaseUrl: http://ai-service:8090
     ports:
       - "8080:8080"
     depends_on:
       - sqlserver
       - redis
+      - ai-service
 
   web:
     image: node:24-alpine
@@ -51,6 +53,13 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+
+  ai-service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
 
 volumes:
   sql_data:
