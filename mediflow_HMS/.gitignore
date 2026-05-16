@@ -1,0 +1,27 @@
+﻿# Global
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# .NET
+bin/
+obj/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log

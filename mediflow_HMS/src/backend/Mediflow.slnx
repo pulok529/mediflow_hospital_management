@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Mediflow.Api/Mediflow.Api.csproj" />
+  <Project Path="Mediflow.Application/Mediflow.Application.csproj" />
+  <Project Path="Mediflow.Domain/Mediflow.Domain.csproj" />
+  <Project Path="Mediflow.Infrastructure/Mediflow.Infrastructure.csproj" />
+</Solution>

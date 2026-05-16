@@ -1,0 +1,6 @@
+@Mediflow.Api_HostAddress = http://localhost:5268
+
+GET {{Mediflow.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

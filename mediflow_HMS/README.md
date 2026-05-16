@@ -1,0 +1,42 @@
+﻿# Mediflow HMS Foundation
+
+This folder contains the initial production-grade foundation for Mediflow Hospital Management System.
+
+## Stack
+- Frontend: React + TypeScript + Vite + Tailwind CSS + TanStack Query/Table
+- Backend: ASP.NET Core Web API + C# Clean Architecture (Api/Application/Domain/Infrastructure)
+- Data: SQL Server
+- Infra: Docker Compose (API, Web, SQL Server, Redis, object storage placeholder)
+
+## Repository Layout
+- `src/backend/Mediflow.slnx`
+- `src/backend/Mediflow.Api`
+- `src/backend/Mediflow.Application`
+- `src/backend/Mediflow.Domain`
+- `src/backend/Mediflow.Infrastructure`
+- `src/frontend/web`
+
+## Run with Docker
+1. Copy env file:
+   - `copy .env.example .env`
+2. Start containers:
+   - `docker compose up --build`
+3. Access apps:
+   - Web: `http://localhost:5173`
+   - API Swagger: `http://localhost:8080/swagger`
+   - Hangfire: `http://localhost:8080/hangfire`
+   - MinIO Console: `http://localhost:9001`
+
+## Run Locally (without Docker)
+1. Backend:
+   - `cd src/backend/Mediflow.Api`
+   - `dotnet run`
+2. Frontend:
+   - `cd src/frontend/web`
+   - `npm install`
+   - `npm run dev`
+
+## Foundation Notes
+- Auth baseline and route guards are included.
+- Role/permission/user domain skeleton is included.
+- Business modules are intentionally deferred for next prompts.
