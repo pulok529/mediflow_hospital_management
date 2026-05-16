@@ -16,7 +16,14 @@
   { label: "Admission Wizard", href: "/admission/wizard" },
   { label: "Bed Configuration", href: "/admission/config" },
   { label: "Live Bed Board", href: "/admission/bed-board" },
-  { label: "Floor Reception", href: "/admission/floor-reception" }
+  { label: "Floor Reception", href: "/admission/floor-reception" },
+  { label: "Nurse Dashboard", href: "/nursing" },
+  { label: "Assigned Patients", href: "/nursing/assigned" },
+  { label: "Medication Due", href: "/nursing/medications" },
+  { label: "Vitals Recording", href: "/nursing/vitals" },
+  { label: "Nursing Notes", href: "/nursing/notes" },
+  { label: "Shift Handover", href: "/nursing/handover" },
+  { label: "Transfer/Discharge", href: "/nursing/transfer-discharge" }
 ];
 
 export function Sidebar() {

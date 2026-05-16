@@ -90,3 +90,24 @@ export const admissionApi = {
     floorReception: () => request<any>("/api/admissions/floor-reception")
   }
 };
+
+export const nursingApi = {
+  dashboard: () => request<any>("/api/nursing/dashboard"),
+  notes: {
+    add: (body: any) => request<any>("/api/nursing/notes", { method: "POST", body: JSON.stringify(body) }),
+    list: (admissionId: string) => request<any[]>(`/api/nursing/notes/${admissionId}`)
+  },
+  medications: {
+    add: (body: any) => request<any>("/api/nursing/medications", { method: "POST", body: JSON.stringify(body) }),
+    due: () => request<any[]>("/api/nursing/medications/due"),
+    administer: (id: string, remarks?: string) => request<any>(`/api/nursing/medications/${id}/administer`, { method: "PUT", body: JSON.stringify({ remarks }) })
+  },
+  vitals: {
+    schedule: (body: any) => request<any>("/api/nursing/vitals/schedule", { method: "POST", body: JSON.stringify(body) }),
+    record: (id: string, body: any) => request<any>(`/api/nursing/vitals/${id}/record`, { method: "PUT", body: JSON.stringify(body) })
+  },
+  handover: {
+    add: (body: any) => request<any>("/api/nursing/handover", { method: "POST", body: JSON.stringify(body) })
+  },
+  transferDischarge: () => request<any[]>("/api/nursing/transfer-discharge")
+};

@@ -21,6 +21,13 @@ import { AdmissionDeskWizardPage } from "@/pages/admission/AdmissionDeskWizardPa
 import { BedConfigurationPage } from "@/pages/admission/BedConfigurationPage";
 import { BedBoardPage } from "@/pages/admission/BedBoardPage";
 import { FloorReceptionDashboardPage } from "@/pages/admission/FloorReceptionDashboardPage";
+import { NurseStationDashboardPage } from "@/pages/nursing/NurseStationDashboardPage";
+import { AssignedPatientsPage } from "@/pages/nursing/AssignedPatientsPage";
+import { MedicationDueListPage } from "@/pages/nursing/MedicationDueListPage";
+import { VitalsRecordingPage } from "@/pages/nursing/VitalsRecordingPage";
+import { NursingNoteEntryPage } from "@/pages/nursing/NursingNoteEntryPage";
+import { ShiftHandoverPage } from "@/pages/nursing/ShiftHandoverPage";
+import { TransferDischargePreparationPage } from "@/pages/nursing/TransferDischargePreparationPage";
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +80,18 @@ export const router = createBrowserRouter([
           { path: "/admission/config", element: <BedConfigurationPage /> },
           { path: "/admission/bed-board", element: <BedBoardPage /> },
           { path: "/admission/floor-reception", element: <FloorReceptionDashboardPage /> }
+        ]
+      },
+      {
+        element: <RoleGuard roles={["SuperAdmin", "Admin", "Nurse", "FloorReceptionist"]} />,
+        children: [
+          { path: "/nursing", element: <NurseStationDashboardPage /> },
+          { path: "/nursing/assigned", element: <AssignedPatientsPage /> },
+          { path: "/nursing/medications", element: <MedicationDueListPage /> },
+          { path: "/nursing/vitals", element: <VitalsRecordingPage /> },
+          { path: "/nursing/notes", element: <NursingNoteEntryPage /> },
+          { path: "/nursing/handover", element: <ShiftHandoverPage /> },
+          { path: "/nursing/transfer-discharge", element: <TransferDischargePreparationPage /> }
         ]
       }
     ]
