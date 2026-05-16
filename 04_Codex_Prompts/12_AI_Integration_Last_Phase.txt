@@ -1,0 +1,23 @@
+Implement the AI integration as a separate last-phase service.
+
+Architecture:
+- Keep main system in ASP.NET Core
+- Create a separate Python FastAPI AI service
+- ASP.NET sends only minimal required data
+- Every AI output must be a draft and require human approval
+- Save AI request, AI output, approval status, and audit trail
+
+Initial AI features:
+1. Doctor note drafting
+2. Discharge summary generation
+3. Patient-friendly lab result explanation
+4. Duplicate patient detection
+5. Billing anomaly detection
+6. Inventory demand forecasting
+
+Deliverables:
+- API contracts between ASP.NET and FastAPI
+- Frontend AI assistant panels where relevant
+- AI review/approve UX
+- Prompt and model version tracking
+- Safety labels on AI output

@@ -1,0 +1,11 @@
+Prepare the system for user acceptance testing and final refinement.
+
+Requirements:
+- End-to-end workflow testing checklists
+- Role-by-role acceptance criteria
+- UI polish and consistency pass
+- Validation and error-message review
+- Performance and concurrency review
+- UAT bug triage process
+- Go-live readiness checklist
+- Training guide outline for hospital staff

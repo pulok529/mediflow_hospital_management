@@ -1,0 +1,19 @@
+Implement admission workflow and building/floor/room/bed management.
+
+Requirements:
+- Building, Floor, Ward, Room, Bed structure
+- Bed statuses: Available, Occupied, Reserved, CleaningRequired, UnderCleaning, Maintenance, Isolation, TransferPending, DischargePending
+- Admission request from OPD / Emergency
+- Bed assignment
+- Bed transfer
+- Floor reception view
+- Bed board
+- Admission deposit support
+- Admission history and bed history
+- Audit log for every bed movement
+
+Frontend:
+- Admission desk wizard
+- Building/floor/room/bed configuration screens
+- Live bed board UI
+- Floor reception dashboard

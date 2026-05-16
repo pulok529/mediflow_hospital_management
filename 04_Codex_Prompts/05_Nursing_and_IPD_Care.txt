@@ -1,0 +1,19 @@
+Implement nursing workflows for admitted patients.
+
+Backend:
+- Nursing notes
+- Medication administration record
+- Vitals schedule
+- Intake/output
+- Shift handover
+- Doctor round notes linkage
+- Alerts for critical or overdue tasks
+
+Frontend:
+- Nurse station dashboard
+- Assigned patients
+- Medication due list
+- Vitals recording screen
+- Nursing note entry
+- Shift handover screen
+- Transfer/discharge preparation view

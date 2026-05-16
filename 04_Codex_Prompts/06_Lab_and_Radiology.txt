@@ -1,0 +1,24 @@
+Implement lab and radiology workflows.
+
+Lab requirements:
+- Lab test catalog
+- Lab orders
+- Sample collection
+- Result entry
+- Approval flow
+- Critical result flagging
+
+Radiology requirements:
+- Imaging service catalog
+- Imaging orders
+- Scheduling
+- Report entry and approval
+- Imaging metadata / file reference model
+- Do not store heavy images directly in SQL Server
+
+Frontend:
+- Lab dashboard with status tabs
+- Sample collection screen
+- Result entry and approval screen
+- Radiology dashboard
+- Imaging schedule and report screen

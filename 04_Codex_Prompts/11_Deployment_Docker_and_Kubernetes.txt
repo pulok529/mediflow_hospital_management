@@ -1,0 +1,14 @@
+Prepare the Hospital Management System for deployment.
+
+Requirements:
+- Dockerfiles for frontend and backend
+- Docker Compose for development and staging
+- Environment variable strategy
+- Reverse proxy config
+- Production configuration guidance
+- Kubernetes manifests / Helm-style structure for later enterprise deployment
+- CI/CD workflow examples
+- Logging and monitoring integration points
+- Secure secret management strategy
+
+Do not change domain logic unless necessary; focus on deployability and ops readiness.

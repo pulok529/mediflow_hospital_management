@@ -1,0 +1,15 @@
+Implement real-time notifications and system hardening.
+
+Requirements:
+- SignalR-based live updates for queue, bed board, new orders, discharge requests
+- Notification center UI
+- Hangfire jobs for reminders and background processing
+- Better error handling and observability
+- Health checks
+- Security hardening
+- Backup/restore operational docs
+- Performance review and optimization
+
+Frontend:
+- Notification drawer
+- Live updates on bed board and queues

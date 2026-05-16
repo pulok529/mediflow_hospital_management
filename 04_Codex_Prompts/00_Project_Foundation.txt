@@ -1,0 +1,29 @@
+You are building a production-grade Hospital Management System.
+
+Tech stack:
+- Frontend: React + TypeScript + Vite + Tailwind CSS + shadcn/ui + TanStack Query + TanStack Table
+- Backend: ASP.NET Core Web API + C# + Clean Architecture + Modular Monolith
+- Database: SQL Server
+- Real-time: SignalR
+- Background Jobs: Hangfire
+- Logging: Serilog
+- Validation: FluentValidation
+- Reporting later: QuestPDF + SSRS/FastReport
+- AI later: Separate Python FastAPI service
+
+Goal of this phase:
+Create the monorepo / repo structure, coding conventions, module boundaries, environment configs,
+Docker setup for local development, authentication baseline, role/permission skeleton,
+shared UI shell, backend solution structure, and CI-ready base.
+
+Deliverables:
+1. Folder structure for frontend and backend.
+2. ASP.NET solution with layered projects: Api, Application, Domain, Infrastructure.
+3. React app with app shell, sidebar, topbar, route guards, auth layout, dashboard layout.
+4. Docker Compose for API, SQL Server, Redis, object storage placeholder.
+5. Basic auth, user, role, permission domain skeleton.
+6. Swagger setup, Serilog setup, global exception handling, validation pipeline.
+7. Frontend theme setup using Tailwind and shadcn/ui.
+8. README with run instructions.
+
+Do not implement business modules yet. Focus on clean foundations.

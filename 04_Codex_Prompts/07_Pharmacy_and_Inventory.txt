@@ -1,0 +1,24 @@
+Implement pharmacy and inventory workflows.
+
+Pharmacy:
+- Medicine master
+- Batches and expiry
+- OPD dispense
+- IPD issue
+- Returns
+- Low stock alerts
+
+Inventory:
+- Supplier
+- Purchase request
+- Purchase order
+- Goods receive flow
+- Department issue
+- Stock movement
+
+Frontend:
+- Pharmacy dashboard
+- Prescription dispensing screen
+- Stock/batch view
+- Inventory dashboard
+- Purchase and stock issue screens

@@ -1,0 +1,21 @@
+Implement patient registration, patient search, appointment booking, and queue/token management.
+
+Backend:
+- Patient module
+- Appointment module
+- Queue module
+- DTOs, validators, services, repositories
+- CRUD and workflow endpoints
+- Search by patient ID, name, phone, DOB
+- Prevent duplicate patients where possible
+- Appointment states and queue states
+
+Frontend:
+- Reception dashboard
+- New patient registration form
+- Existing patient search page
+- Appointment booking page
+- Daily appointment list
+- Queue/token management screen
+
+Include audit logs and validations.

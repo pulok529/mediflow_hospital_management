@@ -1,0 +1,18 @@
+Implement reporting, dashboards, and audit features.
+
+Requirements:
+- Dashboard KPIs for admin, reception, doctor, nurse, pharmacy, lab
+- Report filter patterns
+- Export-ready datasets
+- Audit log viewer
+- Reporting service abstraction
+- Integrate QuestPDF for printable structured documents
+- Prepare support for SSRS / FastReport integration
+
+Frontend:
+- Role-based dashboards
+- Report center
+- Audit log explorer
+- Export actions
+
+Optimize heavy read queries with Dapper where needed.

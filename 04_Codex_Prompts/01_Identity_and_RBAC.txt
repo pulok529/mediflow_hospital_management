@@ -1,0 +1,17 @@
+Implement authentication and authorization for the Hospital Management System.
+
+Requirements:
+- ASP.NET Core Identity or custom auth with JWT + refresh token
+- Role-based and permission-based access control
+- Seed base roles: SuperAdmin, Admin, Receptionist, Doctor, Nurse, LabTech, Pharmacist, BillingOfficer, FloorReceptionist, AdmissionOfficer
+- Permission model examples: Patient.View, Patient.Create, Appointment.Create, Billing.Refund, Bed.Assign, Discharge.Approve
+- Backend endpoints for login, refresh token, user CRUD, role CRUD, permission management
+- Audit log for user and permission changes
+- Frontend screens:
+  - Login
+  - User Management
+  - Role Management
+  - Permission Assignment
+- Route and component guards in React
+
+Focus on enterprise-ready security structure and usability.

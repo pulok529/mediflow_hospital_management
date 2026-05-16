@@ -1,0 +1,22 @@
+Implement OPD visit flow and doctor consultation.
+
+Backend:
+- Visit / Encounter module
+- Vitals
+- Chief complaint
+- Diagnosis
+- Prescription
+- Clinical notes
+- Doctor order structure for lab/radiology
+- Follow-up information
+
+Frontend:
+- Doctor dashboard
+- Waiting patients list
+- Consultation screen
+- Vitals panel
+- Prescription builder
+- Follow-up / advice section
+- Previous history timeline
+
+Keep workflow optimized for doctors.

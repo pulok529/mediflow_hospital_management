@@ -1,0 +1,20 @@
+Implement billing, payments, refunds, discounts, and discharge workflow.
+
+Backend:
+- OPD billing
+- IPD running billing
+- Payment handling
+- Advance payments
+- Discount approval flow
+- Refund flow
+- Final billing clearance
+- Discharge summary data structure
+
+Frontend:
+- Billing dashboard
+- Running bill view
+- Payment entry
+- Refund screen
+- Discount approval queue
+- Discharge checklist
+- Final bill clearance screen
