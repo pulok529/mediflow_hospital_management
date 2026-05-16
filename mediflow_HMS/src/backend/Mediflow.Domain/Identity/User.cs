@@ -14,4 +14,10 @@ public sealed class User : BaseEntity
         Email = email;
         PasswordHash = passwordHash;
     }
+
+    public void UpdateProfile(string email, bool isActive)
+    {
+        Email = email;
+        IsActive = isActive;
+    }
 }

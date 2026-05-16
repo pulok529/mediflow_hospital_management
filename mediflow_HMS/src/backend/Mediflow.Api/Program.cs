@@ -11,9 +11,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration)
-    .WriteTo.Console());
+builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -25,15 +23,13 @@ builder.Services
     .AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
 
 builder.Services.AddInfrastructure();
-
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer();
 
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "super-secret-key-change-me";
 var key = Encoding.UTF8.GetBytes(jwtSecret);
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -44,9 +40,14 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            NameClaimType = "sub",
+            RoleClaimType = "role"
         };
     });
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("web", policy => policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
 
 builder.Services.AddAuthorization();
 
@@ -62,6 +63,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("web");
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -70,3 +72,4 @@ app.MapControllers();
 app.MapHangfireDashboard("/hangfire");
 
 app.Run();
+

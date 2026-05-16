@@ -11,4 +11,6 @@ public sealed class Role : BaseEntity
     {
         Name = name;
     }
+
+    public void Rename(string name) => Name = name;
 }

@@ -2,5 +2,5 @@
 
 public interface ITokenService
 {
-    string CreateToken(Guid userId, string email, IReadOnlyCollection<string> permissions);
+    string CreateToken(Guid userId, string email, IReadOnlyCollection<string> permissions, IReadOnlyCollection<string> roles);
 }
