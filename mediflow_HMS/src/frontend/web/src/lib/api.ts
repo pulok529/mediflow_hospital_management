@@ -71,3 +71,22 @@ export const consultationApi = {
   waiting: (date: string) => request<any[]>(`/api/consultations/waiting?date=${date}`),
   history: (patientId: string) => request<any[]>(`/api/consultations/history/${patientId}`)
 };
+
+export const admissionApi = {
+  config: {
+    hierarchy: () => request<any>("/api/admission/config/hierarchy"),
+    createBuilding: (body: any) => request<any>("/api/admission/config/buildings", { method: "POST", body: JSON.stringify(body) }),
+    createFloor: (body: any) => request<any>("/api/admission/config/floors", { method: "POST", body: JSON.stringify(body) }),
+    createWard: (body: any) => request<any>("/api/admission/config/wards", { method: "POST", body: JSON.stringify(body) }),
+    createRoom: (body: any) => request<any>("/api/admission/config/rooms", { method: "POST", body: JSON.stringify(body) }),
+    createBed: (body: any) => request<any>("/api/admission/config/beds", { method: "POST", body: JSON.stringify(body) })
+  },
+  admissions: {
+    create: (body: any) => request<any>("/api/admissions", { method: "POST", body: JSON.stringify(body) }),
+    assignBed: (id: string, bedId: string) => request<any>(`/api/admissions/${id}/assign-bed`, { method: "PUT", body: JSON.stringify({ bedId }) }),
+    transferBed: (id: string, toBedId: string, reason: string) => request<any>(`/api/admissions/${id}/transfer-bed`, { method: "PUT", body: JSON.stringify({ toBedId, reason }) }),
+    list: () => request<any[]>("/api/admissions"),
+    bedBoard: () => request<any[]>("/api/admissions/bed-board"),
+    floorReception: () => request<any>("/api/admissions/floor-reception")
+  }
+};

@@ -17,6 +17,10 @@ import { DoctorDashboardPage } from "@/pages/doctor/DoctorDashboardPage";
 import { WaitingPatientsPage } from "@/pages/doctor/WaitingPatientsPage";
 import { ConsultationPage } from "@/pages/doctor/ConsultationPage";
 import { HistoryTimelinePage } from "@/pages/doctor/HistoryTimelinePage";
+import { AdmissionDeskWizardPage } from "@/pages/admission/AdmissionDeskWizardPage";
+import { BedConfigurationPage } from "@/pages/admission/BedConfigurationPage";
+import { BedBoardPage } from "@/pages/admission/BedBoardPage";
+import { FloorReceptionDashboardPage } from "@/pages/admission/FloorReceptionDashboardPage";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +64,15 @@ export const router = createBrowserRouter([
           { path: "/doctor/waiting", element: <WaitingPatientsPage /> },
           { path: "/doctor/consultation", element: <ConsultationPage /> },
           { path: "/doctor/history", element: <HistoryTimelinePage /> }
+        ]
+      },
+      {
+        element: <RoleGuard roles={["SuperAdmin", "Admin", "AdmissionOfficer", "FloorReceptionist"]} />,
+        children: [
+          { path: "/admission/wizard", element: <AdmissionDeskWizardPage /> },
+          { path: "/admission/config", element: <BedConfigurationPage /> },
+          { path: "/admission/bed-board", element: <BedBoardPage /> },
+          { path: "/admission/floor-reception", element: <FloorReceptionDashboardPage /> }
         ]
       }
     ]
