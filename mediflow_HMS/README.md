@@ -65,3 +65,4 @@ This folder contains the initial production-grade foundation for Mediflow Hospit
 - UAT package: `docs/uat/README.md`
 - Performance and concurrency notes: `docs/performance_review.md`
 - Production gap assessment: `docs/reviews/production_gap_assessment.md`
+- Complete project plan: `docs/reviews/mediflow_complete_project_plan.txt`

@@ -1,0 +1,801 @@
+Mediflow HMS - Complete Project Completion Plan
+Generated purpose: turn the current Mediflow prototype/foundation into a real hospital management system product.
+
+Important principle:
+Do not treat any item as "later" or optional unless a client explicitly removes it from scope. The phases below are ordered by dependency and risk. Some modules can be implemented in parallel, but all must be completed before calling the product production-ready.
+
+============================================================
+PHASE 0 - BASELINE CONTROL AND PRODUCT GOVERNANCE
+============================================================
+
+Goal:
+Create a stable execution baseline so every following phase can be built, tested, reviewed, and deployed safely.
+
+Steps:
+1. Freeze current branch as the post-prompt foundation baseline.
+2. Keep GitHub main protected and use feature branches for each module.
+3. Create issue labels: foundation, database, rbac, patient, appointment, opd, emergency, admission, nursing, diagnostics, pharmacy, billing, reporting, print, security, tests, deployment, ai, uat.
+4. Create a product decision log for configurable hospital rules.
+5. Define default hospital rules from the production PDF as system defaults.
+6. Create a "client override" mechanism for hospital-specific policies.
+7. Keep all known limitations documented in docs/reviews/production_gap_assessment.md.
+8. Update README after each phase with completed capabilities and run commands.
+
+Exit criteria:
+1. Main branch builds.
+2. Current limitations are documented.
+3. Next phases are tracked as implementation issues or checklist items.
+
+============================================================
+PHASE 1 - DATABASE PERSISTENCE AND DATA MODEL
+============================================================
+
+Goal:
+Replace demo-level in-memory data with durable SQL Server persistence and enforce core data integrity.
+
+Steps:
+1. Add EF Core packages to backend projects.
+2. Create production AppDbContext mappings for all core entities.
+3. Replace in-memory identity persistence with database-backed users, roles, permissions, refresh tokens, and audit logs.
+4. Add patient tables: Patient, PatientIdentifier, PatientContact, PatientAllergy, PatientDocument, PatientMergeRequest.
+5. Add appointment tables: Appointment, DoctorSchedule, DoctorSlot, AppointmentHistory, QueueToken.
+6. Add OPD tables: Encounter, EncounterVital, Diagnosis, Prescription, PrescriptionItem, DoctorOrder, EncounterRevision.
+7. Add emergency tables: EmergencyVisit, TriageRecord, EmergencyTreatment, EmergencyOutcome.
+8. Add admission tables: AdmissionRequest, Admission, BedAssignment, BedReservation, BedTransfer, BedStatusHistory.
+9. Add facility tables: Building, Floor, Ward, Room, Bed, Department, Service, DoctorProfile.
+10. Add nursing tables: NursingNote, MedicationSchedule, MedicationAdministration, VitalsSchedule, IntakeOutput, ShiftHandover, CareAlert.
+11. Add diagnostics tables: LabTestCatalog, LabOrder, LabSample, LabResult, LabResultParameter, LabApproval, ImagingCatalog, ImagingOrder, ImagingSchedule, ImagingReport, ImagingStudyReference.
+12. Add pharmacy tables: Medicine, MedicineBatch, StockLedger, Dispense, ReturnRequest, Supplier, PurchaseRequest, PurchaseOrder, GoodsReceive, DepartmentIssue, StockAdjustment.
+13. Add billing tables: Invoice, InvoiceLine, Payment, Receipt, DiscountRequest, RefundRequest, CashierSession, CashClosing, InsuranceClaim, CorporateAccount.
+14. Add discharge tables: DischargeRequest, DischargeChecklist, DischargeSummary, DischargeSummaryRevision, LamaDamaForm, DeathRecord, ReferralLetter.
+15. Add housekeeping and maintenance tables: CleaningTask, MaintenanceTask, VerificationRecord.
+16. Add reporting/export tables: ReportRun, ReportExportAudit.
+17. Add AI tables: AiRequest, AiOutput, AiApproval, AiAuditTrail, AiPromptVersion, AiModelVersion.
+18. Add audit fields to all business tables: CreatedAtUtc, CreatedBy, UpdatedAtUtc, UpdatedBy.
+19. Add row version/concurrency tokens to high-conflict tables: Bed, Admission, QueueToken, MedicineBatch, StockLedger, Invoice, Payment, LabResult.
+20. Add indexes for search and reporting: patient code, phone, NID, name+DOB, appointment date, doctor, admission status, bed status, invoice number, receipt number.
+21. Add unique constraints: PatientCode, active bed assignment per bed, active admission per patient unless override, invoice number, receipt number, medicine batch per medicine.
+22. Add EF Core migrations.
+23. Add seed data for roles, permissions, departments, doctors, services, payment methods, bed statuses, medicine forms, report templates.
+24. Update Docker Compose startup to support migrations.
+25. Add migration validation to CI.
+
+Exit criteria:
+1. Data survives application restart.
+2. All existing API workflows use SQL persistence.
+3. Migrations run cleanly in local Docker.
+4. Core constraints prevent double bed assignment and negative stock.
+
+============================================================
+PHASE 2 - RBAC, PERMISSIONS, AND SECURITY MODEL
+============================================================
+
+Goal:
+Move from broad role checks to hospital-grade permission-based access control.
+
+Steps:
+1. Finalize canonical roles: SuperAdmin, Admin, Receptionist, Doctor, Nurse, AdmissionOfficer, FloorReceptionist, LabTech, Pathologist, RadiologyTech, Radiologist, Pharmacist, BillingOfficer, Cashier, Housekeeping, Maintenance, PatientPortalUser.
+2. Create permission catalog by module and operation.
+3. Replace controller-level role strings with authorization policies.
+4. Add endpoint permissions for create, read, update, approve, cancel, print, export, refund, discount, final clearance, clinical override.
+5. Add branch/location/floor-level access support.
+6. Add audit for sensitive record viewing, not only write actions.
+7. Add password policy.
+8. Add account lockout after failed login attempts.
+9. Add password reset flow.
+10. Add optional MFA support for admins, doctors, billing, and pharmacists.
+11. Remove production fallback secrets.
+12. Move secrets to environment variables or secret manager.
+13. Review production CORS.
+14. Review CSP for frontend assets and SignalR.
+15. Add endpoint-specific rate limits.
+16. Add admin override reason workflow.
+17. Add inactive user and expired password behavior.
+18. Add role-aware sidebar filtering in frontend.
+19. Add unauthorized and forbidden pages.
+20. Add RBAC integration tests.
+
+Exit criteria:
+1. Every sensitive endpoint has a named permission.
+2. UI actions hide or disable based on permission.
+3. Access-denied behavior is clear.
+4. Audit logs show who viewed or changed sensitive data.
+
+============================================================
+PHASE 3 - PATIENT MASTER, REGISTRATION, AND PROFILE
+============================================================
+
+Goal:
+Complete patient identity and longitudinal record foundation.
+
+Steps:
+1. Expand patient registration fields: name, DOB/age, gender, mobile, address, guardian, emergency contact, NID/passport/birth certificate, blood group, allergies, occupation, marital status, photo.
+2. Add emergency mode with minimum required fields.
+3. Add duplicate warning for phone, NID, same/similar name plus DOB.
+4. Add duplicate merge workflow with Admin or Medical Records permission.
+5. Add patient code generation with hospital prefix configuration.
+6. Add patient profile page.
+7. Add patient profile tabs: summary, visits, prescriptions, lab, radiology, admissions, billing, documents, audit.
+8. Add patient document upload backed by object storage.
+9. Add edit patient workflow with audit trail.
+10. Add patient status: active, inactive, deceased, merged.
+11. Add patient relationship/dependent support.
+12. Add patient registration slip print.
+13. Add patient ID card print.
+14. Add patient search filters: code, name, phone, NID, DOB, status.
+15. Add "save and book appointment" flow.
+16. Add "save and emergency visit" flow.
+17. Add frontend validation and server validation.
+18. Add patient module tests.
+
+Exit criteria:
+1. Patient can be registered, searched, edited, merged, and printed.
+2. Duplicate warnings work.
+3. Patient profile shows the complete record timeline.
+
+============================================================
+PHASE 4 - APPOINTMENT, CHECK-IN, AND QUEUE
+============================================================
+
+Goal:
+Complete the front-door outpatient flow.
+
+Steps:
+1. Add doctor schedules and availability slots.
+2. Add appointment type configuration.
+3. Add department/service/doctor appointment booking.
+4. Add slot conflict prevention.
+5. Add overbooking permission.
+6. Add appointment statuses: booked, confirmed, checked-in, cancelled, rescheduled, no-show, completed.
+7. Add cancellation reason.
+8. Add reschedule history.
+9. Add grace period configuration for no-show.
+10. Add appointment notifications.
+11. Add check-in action.
+12. Generate token at check-in.
+13. Separate queues by department, doctor, service, and counter.
+14. Add queue actions: call, recall, skip, return skipped, start service, complete, mark absent.
+15. Add SignalR real-time queue updates.
+16. Add token print/reprint.
+17. Add doctor absent handling.
+18. Add emergency bypass behavior.
+19. Add daily appointment and queue reports.
+20. Add appointment/queue tests.
+
+Exit criteria:
+1. Patient can move from booking to check-in to queue to doctor.
+2. Queue updates are real-time.
+3. No duplicate slot is allowed unless permission exists.
+
+============================================================
+PHASE 5 - OPD CONSULTATION AND PRESCRIPTION
+============================================================
+
+Goal:
+Complete doctor workflow and outpatient clinical documentation.
+
+Steps:
+1. Add doctor dashboard with waiting queue, active encounters, follow-ups, critical alerts.
+2. Add consultation page patient header with allergies, alerts, age, gender, patient code.
+3. Add previous history timeline.
+4. Add vitals review section.
+5. Add structured note fields: chief complaint, history, examination, diagnosis, advice, follow-up.
+6. Add draft and completed encounter states.
+7. Prevent completion without minimum note/diagnosis/advice.
+8. Add diagnosis coding support.
+9. Add prescription builder fields: medicine, strength, route, dose, frequency, duration, meal instruction, special note.
+10. Add duplicate medicine warning.
+11. Add allergy warning.
+12. Add prescription templates.
+13. Add finalize prescription action.
+14. Lock finalized prescription.
+15. Add revision with reason and version history.
+16. Add lab order from consultation.
+17. Add radiology order from consultation.
+18. Add advise admission action.
+19. Add referral action.
+20. Add prescription PDF/print.
+21. Add OPD consultation tests.
+
+Exit criteria:
+1. Doctor can complete a safe consultation from queue.
+2. Prescription is printable and locked after finalization.
+3. Orders flow to lab/radiology.
+
+============================================================
+PHASE 6 - EMERGENCY MODULE
+============================================================
+
+Goal:
+Support emergency care where treatment cannot be blocked by normal administrative gaps.
+
+Steps:
+1. Add emergency registration screen.
+2. Allow minimal unknown patient registration.
+3. Add arrival mode and brought-by fields.
+4. Add triage category and triage vitals.
+5. Add emergency complaint.
+6. Add emergency bed assignment.
+7. Add emergency treatment notes.
+8. Add emergency orders.
+9. Add convert-to-admission workflow.
+10. Add emergency discharge workflow.
+11. Add referral workflow.
+12. Add sent-to-OT outcome.
+13. Add death case workflow.
+14. Add LAMA/DAMA workflow.
+15. Ensure billing does not block treatment.
+16. Add emergency audit events.
+17. Add emergency reports.
+18. Add emergency tests.
+
+Exit criteria:
+1. Emergency patient can be registered and treated with minimal information.
+2. Outcome is required before closing emergency visit.
+
+============================================================
+PHASE 7 - ADMISSION, BED, FLOOR, HOUSEKEEPING, AND MAINTENANCE
+============================================================
+
+Goal:
+Complete inpatient bed lifecycle.
+
+Steps:
+1. Add admission request queue.
+2. Add admission request fields: patient, source, diagnosis, doctor, department, requested room type, guardian, payment type.
+3. Add active admission conflict check.
+4. Add bed reservation with expiry.
+5. Add admission wizard final transactional save.
+6. Recheck bed availability inside database transaction.
+7. Set bed status to occupied after assignment.
+8. Add transfer workflow.
+9. Old bed becomes cleaning required after transfer.
+10. Add bed charge start configuration.
+11. Add floor reception arrival confirmation.
+12. Add room/bed status dashboard.
+13. Add visitor pass workflow.
+14. Add housekeeping cleaning task list.
+15. Add cleaning task states: requested, accepted, started, completed, verified.
+16. Bed becomes available only after verified cleaning.
+17. Add maintenance request workflow.
+18. Add maintenance task states: requested, accepted, started, resolved, verified.
+19. Bed/room remains unavailable until maintenance verification.
+20. Add bed board real-time updates.
+21. Add bed occupancy and cleaning/maintenance reports.
+22. Add admission/bed tests.
+
+Exit criteria:
+1. Bed cannot be double-assigned.
+2. Bed lifecycle matches hospital flow from available to occupied to cleaning/maintenance to available.
+
+============================================================
+PHASE 8 - NURSING AND IPD CARE
+============================================================
+
+Goal:
+Complete nurse station workflows for admitted patients.
+
+Steps:
+1. Add assigned patient list by floor/ward.
+2. Add nurse arrival confirmation after admission/transfer.
+3. Add nursing notes.
+4. Add doctor orders list.
+5. Add vitals schedule and recording.
+6. Add critical vital thresholds.
+7. Trigger notifications for critical vitals.
+8. Add medication schedule.
+9. Add medication administration statuses: scheduled, given, missed, held, refused, not available, stopped.
+10. Require reason for missed, held, and refused.
+11. Record actual medication given time.
+12. Add intake/output charting.
+13. Add shift handover write action.
+14. Add handover acceptance by incoming nurse.
+15. Prevent shift handover closure until accepted.
+16. Add request doctor review action.
+17. Add discharge preparation list.
+18. Add nursing reports.
+19. Add nursing tests.
+
+Exit criteria:
+1. Nurse can safely manage assigned IPD patients.
+2. Medication and handover workflows enforce required reasons and acceptance.
+
+============================================================
+PHASE 9 - LAB AND RADIOLOGY
+============================================================
+
+Goal:
+Complete investigation ordering, sample/report processing, approval, and release.
+
+Steps:
+1. Split lab roles: LabTech and Pathologist.
+2. Split radiology roles: RadiologyTech and Radiologist.
+3. Add lab dashboard tabs: payment pending, sample pending, sample collected, in process, result entry, approval pending, critical, delivered.
+4. Add barcode generation and print.
+5. Add sample collection.
+6. Add sample rejection with reason.
+7. Add result parameter templates.
+8. Add result value, unit, reference range, abnormal flag, remarks.
+9. Add critical auto flagging.
+10. Add result approval by Pathologist.
+11. Lock approved results.
+12. Add correction workflow with versioning.
+13. Add critical result acknowledgement by doctor/nurse.
+14. Add lab report PDF.
+15. Add radiology order list.
+16. Add radiology scheduling.
+17. Add scan complete action.
+18. Add accession number.
+19. Add DICOM study ID and PACS metadata.
+20. Add report findings and impression.
+21. Add radiologist approval.
+22. Lock approved radiology reports.
+23. Add radiology report PDF.
+24. Add lab/radiology reports.
+25. Add diagnostics tests.
+
+Exit criteria:
+1. Lab and radiology results cannot be silently changed after approval.
+2. Critical results are acknowledged.
+3. Reports can be printed.
+
+============================================================
+PHASE 10 - PHARMACY, INVENTORY, AND PURCHASE
+============================================================
+
+Goal:
+Complete medicine stock, dispensing, returns, purchase, and ledger controls.
+
+Steps:
+1. Add medicine master with code, generic, brand, form, strength, route, reorder level.
+2. Add supplier master.
+3. Add batch stock with expiry, unit cost, sale price, quantity.
+4. Enforce FEFO issue by default.
+5. Block expired medicine sale/issue.
+6. Prevent negative stock.
+7. Add admin override for negative stock only if configured.
+8. Add OPD prescription dispensing.
+9. Add IPD medicine issue.
+10. Add partial dispense.
+11. Add substitution workflow.
+12. Add medicine return request.
+13. Add pharmacist approval for returns.
+14. Link returns to billing adjustments.
+15. Add purchase request workflow.
+16. Add purchase request approval.
+17. Add purchase order workflow.
+18. Add purchase order approval.
+19. Add goods receive note.
+20. Add supplier invoice support.
+21. Add department issue.
+22. Add stock adjustment with approval.
+23. Use stock ledger as source of truth.
+24. Add low stock alerts.
+25. Add expiry alerts.
+26. Add stock valuation report.
+27. Add pharmacy and inventory reports.
+28. Add pharmacy tests.
+
+Exit criteria:
+1. Stock ledger is accurate.
+2. Expired and insufficient stock are blocked.
+3. Pharmacy actions correctly affect billing where required.
+
+============================================================
+PHASE 11 - BILLING, FINANCE, INSURANCE, AND CASHIER
+============================================================
+
+Goal:
+Complete revenue workflows and financial control.
+
+Steps:
+1. Add service/pricing master.
+2. Add OPD invoice generation.
+3. Add IPD running bill.
+4. Feed charges from bed, doctor, lab, radiology, pharmacy, procedures, OT, nursing, and services.
+5. Add invoice number generation.
+6. Add receipt number generation.
+7. Add payment methods.
+8. Add payment posting.
+9. Make receipts immutable.
+10. Add adjustment workflow for payment corrections.
+11. Prevent overpayment unless advance rules allow.
+12. Add advance payment support.
+13. Add discount request.
+14. Add discount approval thresholds.
+15. Prevent discount above allowed invoice net amount.
+16. Add refund request.
+17. Require refund approval.
+18. Prevent refund above paid amount.
+19. Add final bill generation.
+20. Block final bill if pending charges, pending pharmacy returns, pending discount approvals, pending reports, or pending payment exist.
+21. Lock final bill after generation.
+22. Add cashier session open/close.
+23. Add cashier day closing with submitted amount comparison.
+24. Add insurance/corporate account master.
+25. Add insurance eligibility and approval fields.
+26. Add corporate/insurance outstanding workflow.
+27. Add finance reports.
+28. Add invoice, receipt, and final bill print.
+29. Add billing tests.
+
+Exit criteria:
+1. Bills and receipts are auditable and immutable after posting.
+2. Final clearance cannot bypass required checks.
+
+============================================================
+PHASE 12 - DISCHARGE, REFERRAL, LAMA/DAMA, AND DEATH CASE
+============================================================
+
+Goal:
+Complete patient release governance.
+
+Steps:
+1. Add discharge request by doctor.
+2. Add discharge checklist.
+3. Require doctor discharge approval.
+4. Require nursing clearance.
+5. Require pharmacy clearance.
+6. Require pending report review.
+7. Require billing clearance.
+8. Require discharge summary.
+9. Add discharge summary draft.
+10. Add discharge summary approval.
+11. Lock approved discharge summary.
+12. Add correction workflow with versioning.
+13. Add final release action.
+14. Set bed to cleaning required after release.
+15. Add LAMA/DAMA form workflow.
+16. Add death case workflow.
+17. Add death certificate print.
+18. Add referral letter workflow.
+19. Add discharge summary print.
+20. Add discharge reports.
+21. Add discharge tests.
+
+Exit criteria:
+1. Patient cannot be released until all required clearances pass.
+2. Discharge documents are printable and versioned.
+
+============================================================
+PHASE 13 - REPORTING, DASHBOARDS, EXPORTS, AND PRINT DOCUMENTS
+============================================================
+
+Goal:
+Provide operational, clinical, financial, and audit reporting required for hospital management.
+
+Steps:
+1. Build report center categories: patient, appointment, OPD, emergency, admission, bed, nursing, lab, radiology, pharmacy, inventory, billing, discharge, audit, management.
+2. Add date, department, doctor, floor, payment, status filters.
+3. Add export PDF.
+4. Add export Excel/CSV.
+5. Audit sensitive report exports.
+6. Add daily registration report.
+7. Add OPD patient report.
+8. Add doctor-wise patient count.
+9. Add department-wise patient count.
+10. Add follow-up due report.
+11. Add no-show report.
+12. Add emergency report.
+13. Add admission report.
+14. Add discharge report.
+15. Add bed occupancy report.
+16. Add floor-wise patient report.
+17. Add bed transfer report.
+18. Add bed cleaning report.
+19. Add maintenance report.
+20. Add lab pending sample report.
+21. Add lab completed report.
+22. Add lab critical result report.
+23. Add radiology pending report.
+24. Add radiology completed report.
+25. Add pharmacy sales report.
+26. Add IPD medicine issue report.
+27. Add medicine return report.
+28. Add batch-wise stock report.
+29. Add expiry report.
+30. Add low stock report.
+31. Add stock valuation report.
+32. Add purchase report.
+33. Add daily collection report.
+34. Add cashier closing report.
+35. Add payment method report.
+36. Add OPD billing report.
+37. Add IPD billing report.
+38. Add due collection report.
+39. Add refund report.
+40. Add discount report.
+41. Add department revenue report.
+42. Add doctor commission report.
+43. Add insurance/corporate outstanding report.
+44. Add user activity report.
+45. Add audit log report.
+46. Add report export log.
+47. Add admin dashboard summary.
+48. Add monthly management summary.
+49. Add patient registration slip.
+50. Add appointment slip.
+51. Add queue token.
+52. Add prescription print.
+53. Add lab report print.
+54. Add radiology report print.
+55. Add invoice print.
+56. Add money receipt print.
+57. Add admission form print.
+58. Add consent form print.
+59. Add final bill print.
+60. Add discharge summary print.
+61. Add death certificate print.
+62. Add referral letter print.
+63. Add LAMA/DAMA form print.
+64. Add visitor pass print.
+65. Add barcode label print.
+66. Add report accuracy tests.
+
+Exit criteria:
+1. All required reports generate correct totals.
+2. Required documents are printable.
+3. Exports are permission-protected and audited.
+
+============================================================
+PHASE 14 - PATIENT PORTAL
+============================================================
+
+Goal:
+Allow patients to securely access their own approved records and appointments.
+
+Steps:
+1. Add PatientPortalUser role.
+2. Add patient portal login.
+3. Add dependent/guardian access rules.
+4. Add profile page.
+5. Add appointment list.
+6. Add appointment booking request.
+7. Add prescription view.
+8. Add approved lab report view.
+9. Add approved radiology report view.
+10. Add bill and receipt view.
+11. Add discharge summary view.
+12. Add online payment integration placeholder.
+13. Add support message workflow.
+14. Add OTP or re-auth for sensitive reports.
+15. Audit patient portal access.
+16. Add portal tests.
+
+Exit criteria:
+1. Patient can view only own or authorized dependent records.
+2. Sensitive report access is secure and audited.
+
+============================================================
+PHASE 15 - NOTIFICATIONS AND REAL-TIME OPERATIONS
+============================================================
+
+Goal:
+Make operational events visible at the right time to the right role.
+
+Steps:
+1. Define notification event catalog.
+2. Add queue call notifications.
+3. Add admission/transfer notifications.
+4. Add critical vitals notifications.
+5. Add medication overdue notifications.
+6. Add critical lab result notifications.
+7. Add radiology approval notifications.
+8. Add low-stock and expiry notifications.
+9. Add pending discount/refund approval notifications.
+10. Add discharge clearance notifications.
+11. Add housekeeping and maintenance notifications.
+12. Add SignalR role/group channels.
+13. Add unread count.
+14. Add notification read/archive state.
+15. Add email/SMS provider abstraction.
+16. Add notification tests.
+
+Exit criteria:
+1. Time-sensitive hospital events appear in real time.
+2. Notification delivery is role-aware and auditable.
+
+============================================================
+PHASE 16 - AI / RAG FINAL PRODUCTION LAYER
+============================================================
+
+Goal:
+Upgrade the AI scaffold into a safe, useful, human-reviewed assistant.
+
+Steps:
+1. Keep AI service isolated from main HMS.
+2. Add AI provider abstraction.
+3. Add model configuration per environment.
+4. Add prompt template registry.
+5. Add prompt version tracking.
+6. Add model version tracking.
+7. Add RAG document ingestion.
+8. Add vector database/search.
+9. Add source citation support.
+10. Add minimal clinical context extraction from HMS.
+11. Add doctor note drafting from encounter context.
+12. Add discharge summary drafting from admission, diagnosis, treatment, medication, reports, and advice.
+13. Add patient-friendly lab explanation with approved-result-only rule.
+14. Add duplicate patient detection from patient index.
+15. Add billing anomaly detection from bill lines, payment, discount, refund, and patient type.
+16. Add inventory demand forecasting from stock ledger and dispensing history.
+17. Keep every AI output draft-only.
+18. Require human approval or rejection.
+19. Add AI safety labels.
+20. Add AI output audit trail.
+21. Add AI failure/fallback behavior.
+22. Add AI red-team test prompts.
+23. Add AI integration tests.
+
+Exit criteria:
+1. AI never writes final clinical/financial records without human approval.
+2. AI outputs include prompt/model versions and citations where applicable.
+
+============================================================
+PHASE 17 - UI/UX PRODUCT POLISH
+============================================================
+
+Goal:
+Make the system feel like a real daily-use hospital operations tool.
+
+Steps:
+1. Create reusable form controls.
+2. Create reusable status badges.
+3. Create reusable data table with filters, sorting, pagination.
+4. Create reusable confirmation modal.
+5. Create reusable patient header.
+6. Create reusable bed card.
+7. Create reusable timeline component.
+8. Create reusable print/export buttons.
+9. Add role-aware dashboard cards.
+10. Add empty states.
+11. Add loading skeletons.
+12. Add inline validation messages.
+13. Add success/error toasts.
+14. Add consistent spacing and typography.
+15. Add mobile/tablet layout pass for wards and reception.
+16. Add accessibility labels and keyboard behavior.
+17. Add visual review for each department.
+18. Add design QA checklist.
+
+Exit criteria:
+1. Staff can navigate workflows quickly without guessing.
+2. Forms and tables are consistent across modules.
+
+============================================================
+PHASE 18 - AUTOMATED TESTING AND QUALITY GATES
+============================================================
+
+Goal:
+Prevent regressions and prove workflows work before client demos or production.
+
+Steps:
+1. Add backend unit test project.
+2. Add backend integration test project.
+3. Add database migration tests.
+4. Add API contract tests.
+5. Add RBAC permission tests.
+6. Add frontend component tests.
+7. Add Playwright E2E tests.
+8. Add patient registration E2E.
+9. Add appointment/queue E2E.
+10. Add OPD consultation E2E.
+11. Add admission/bed E2E.
+12. Add nursing E2E.
+13. Add lab/radiology E2E.
+14. Add pharmacy E2E.
+15. Add billing/discharge E2E.
+16. Add report export E2E.
+17. Add AI approval E2E.
+18. Add load tests for appointment booking.
+19. Add load tests for bed assignment.
+20. Add load tests for stock deduction.
+21. Add load tests for billing/payment.
+22. Add CI jobs for all tests.
+23. Add code coverage reporting.
+24. Add release blocking criteria.
+
+Exit criteria:
+1. CI fails on broken critical workflows.
+2. High-risk concurrency paths have tests.
+
+============================================================
+PHASE 19 - PRODUCTION INFRASTRUCTURE AND OPERATIONS
+============================================================
+
+Goal:
+Make the platform deployable, observable, secure, recoverable, and maintainable.
+
+Steps:
+1. Replace Hangfire MemoryStorage with SQL Server or Redis persistent storage.
+2. Add production Docker build verification.
+3. Add production Kubernetes manifests or Helm chart values.
+4. Add environment-specific appsettings.
+5. Add secret manager integration.
+6. Add centralized logging.
+7. Add OpenTelemetry metrics/tracing.
+8. Add dashboards for API latency, errors, DB health, queue jobs, SignalR, AI service.
+9. Add alerts for 5xx spikes, database failures, job failures, low disk, backup failure.
+10. Add backup policy.
+11. Add restore drill documentation.
+12. Add object storage backup.
+13. Add database migration release step.
+14. Add blue/green or rolling deployment strategy.
+15. Add rollback runbook.
+16. Add production CORS and HTTPS.
+17. Add security headers review.
+18. Add penetration/security checklist.
+19. Add disaster recovery plan.
+20. Add operational runbook.
+
+Exit criteria:
+1. Production deployment can be repeated safely.
+2. Backups and rollback are tested.
+3. Monitoring catches common failures.
+
+============================================================
+PHASE 20 - UAT, TRAINING, CLIENT DEMO, AND GO-LIVE
+============================================================
+
+Goal:
+Prepare the product for real hospital staff review and launch.
+
+Steps:
+1. Build demo data set.
+2. Create demo users for every role.
+3. Create role-by-role UAT scripts.
+4. Create reception training guide.
+5. Create doctor training guide.
+6. Create nursing training guide.
+7. Create lab/radiology training guide.
+8. Create pharmacy training guide.
+9. Create billing training guide.
+10. Create admin training guide.
+11. Create AI review training guide.
+12. Create client feedback form.
+13. Run internal UAT.
+14. Fix UAT blockers.
+15. Run client UAT.
+16. Triage client feedback.
+17. Document hospital-specific rule changes.
+18. Apply approved client-specific configurations.
+19. Run go-live checklist.
+20. Run final backup/restore check.
+21. Run final security check.
+22. Run final performance test.
+23. Prepare launch support roster.
+24. Start hypercare period.
+25. Track post-go-live defects.
+
+Exit criteria:
+1. Client signs off role workflows.
+2. No open blocker/high-severity defects.
+3. Go-live checklist is complete.
+
+============================================================
+FINAL PRODUCT READINESS DEFINITION
+============================================================
+
+Mediflow can be called a real HMS product when all of the following are true:
+
+1. Every core workflow persists to SQL Server.
+2. Database constraints protect bed, stock, billing, and approval integrity.
+3. Role and permission checks are enforced on backend and reflected in UI.
+4. Patient, appointment, OPD, emergency, admission, nursing, lab, radiology, pharmacy, billing, discharge, reporting, housekeeping, maintenance, portal, and AI workflows exist.
+5. All required reports and print documents exist.
+6. Critical actions are audited.
+7. Approved clinical/financial records are locked or versioned.
+8. Automated tests cover critical workflows.
+9. Production deployment, backup, monitoring, logging, and rollback are tested.
+10. Hospital staff can complete UAT role by role.
+
+Recommended implementation order summary:
+1. Database persistence and migrations.
+2. RBAC and security model.
+3. Patient, appointment, queue, OPD, and billing path.
+4. Admission, bed, nursing, and discharge path.
+5. Emergency, lab, radiology, pharmacy, inventory.
+6. Reports and print documents.
+7. Patient portal, housekeeping, maintenance, insurance.
+8. AI/RAG production layer.
+9. Tests, production infra, UAT, training, and go-live.
