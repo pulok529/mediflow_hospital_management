@@ -9,10 +9,13 @@ This phase starts the move from demo in-memory services to SQL Server persistenc
 - SQL-backed patients
 - SQL-backed appointments and queue state
 - SQL-backed admission/facility hierarchy: buildings, floors, wards, rooms, beds, admissions, bed movements
+- SQL-backed consultations: encounters, vitals, prescriptions, and doctor lab/radiology orders
 - Database guards for active admission per patient and active bed assignment
+- Consultation guards for one open encounter per appointment and locked completed encounters
 - EF migrations:
   - `InitialPersistenceSlice`
   - `AdmissionBedPersistence`
+  - `ConsultationPrescriptionPersistence`
 
 ## Apply migration locally
 Run SQL Server from Docker first:
@@ -28,9 +31,8 @@ dotnet ef database update --project src/backend/Mediflow.Infrastructure/Mediflow
 ```
 
 ## Next persistence slices
-1. Consultation and prescriptions.
-2. Nursing and IPD care.
-3. Diagnostics.
-4. Pharmacy stock ledger.
-5. Billing and discharge.
-6. AI request and approval history.
+1. Nursing and IPD care.
+2. Diagnostics.
+3. Pharmacy stock ledger.
+4. Billing and discharge.
+5. AI request and approval history.

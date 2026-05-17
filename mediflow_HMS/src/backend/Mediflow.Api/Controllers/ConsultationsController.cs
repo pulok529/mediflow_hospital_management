@@ -22,8 +22,15 @@ public sealed class ConsultationsController(IConsultationWorkflowService service
     [HttpPut("{encounterId:guid}")]
     public IActionResult Save(Guid encounterId, [FromBody] ApiSaveConsultationRequest request)
     {
-        var result = service.SaveConsultation(encounterId, new(request.Vitals, request.ChiefComplaint, request.Diagnosis, request.ClinicalNotes, request.Prescriptions, request.Orders, request.FollowUpDate, request.FollowUpAdvice, request.CompleteEncounter), ParseActorId(User));
-        return result is null ? NotFound() : Ok(result);
+        try
+        {
+            var result = service.SaveConsultation(encounterId, new(request.Vitals, request.ChiefComplaint, request.Diagnosis, request.ClinicalNotes, request.Prescriptions, request.Orders, request.FollowUpDate, request.FollowUpAdvice, request.CompleteEncounter), ParseActorId(User));
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("waiting")]

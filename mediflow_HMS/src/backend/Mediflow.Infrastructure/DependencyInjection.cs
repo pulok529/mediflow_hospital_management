@@ -39,7 +39,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IIdentityService, DatabaseIdentityService>();
         services.AddScoped<IPatientWorkflowService, DatabasePatientWorkflowService>();
-        services.AddScoped<IConsultationWorkflowService, InMemoryConsultationWorkflowService>();
+        services.AddScoped<IConsultationWorkflowService, DatabaseConsultationWorkflowService>();
         services.AddScoped<IAdmissionWorkflowService, DatabaseAdmissionWorkflowService>();
         services.AddScoped<INursingWorkflowService, InMemoryNursingWorkflowService>();
         services.AddScoped<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();

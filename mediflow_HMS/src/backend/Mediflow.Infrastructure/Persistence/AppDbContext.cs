@@ -1,5 +1,6 @@
 using Mediflow.Application.Abstractions.Patient;
 using Mediflow.Application.Abstractions.Admission;
+using Mediflow.Application.Abstractions.Consultation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mediflow.Infrastructure.Persistence;
@@ -20,6 +21,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<BedEntity> Beds => Set<BedEntity>();
     public DbSet<AdmissionEntity> Admissions => Set<AdmissionEntity>();
     public DbSet<BedMovementEntity> BedMovements => Set<BedMovementEntity>();
+    public DbSet<EncounterEntity> Encounters => Set<EncounterEntity>();
+    public DbSet<EncounterVitalEntity> EncounterVitals => Set<EncounterVitalEntity>();
+    public DbSet<PrescriptionItemEntity> PrescriptionItems => Set<PrescriptionItemEntity>();
+    public DbSet<DoctorOrderEntity> DoctorOrders => Set<DoctorOrderEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -171,6 +176,58 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasOne(x => x.Admission).WithMany(x => x.BedMovements).HasForeignKey(x => x.AdmissionId);
             entity.HasOne(x => x.FromBed).WithMany().HasForeignKey(x => x.FromBedId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(x => x.ToBed).WithMany().HasForeignKey(x => x.ToBedId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<EncounterEntity>(entity =>
+        {
+            entity.ToTable("Encounters");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.AppointmentId, x.State })
+                .IsUnique()
+                .HasFilter("[State] = 'Open'");
+            entity.HasIndex(x => x.PatientId);
+            entity.Property(x => x.PatientName).HasMaxLength(256).IsRequired();
+            entity.Property(x => x.State).HasConversion<string>().HasMaxLength(32);
+            entity.Property(x => x.ChiefComplaint).HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.Diagnosis).HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.ClinicalNotes).HasMaxLength(4000).IsRequired();
+            entity.Property(x => x.FollowUpAdvice).HasMaxLength(2000).IsRequired();
+            entity.Property(x => x.RowVersion).IsRowVersion();
+        });
+
+        modelBuilder.Entity<EncounterVitalEntity>(entity =>
+        {
+            entity.ToTable("EncounterVitals");
+            entity.HasKey(x => x.EncounterId);
+            entity.HasOne(x => x.Encounter).WithOne(x => x.Vitals).HasForeignKey<EncounterVitalEntity>(x => x.EncounterId);
+            entity.Property(x => x.TemperatureC).HasPrecision(5, 2);
+            entity.Property(x => x.SpO2).HasPrecision(5, 2);
+            entity.Property(x => x.WeightKg).HasPrecision(6, 2);
+            entity.Property(x => x.HeightCm).HasPrecision(6, 2);
+        });
+
+        modelBuilder.Entity<PrescriptionItemEntity>(entity =>
+        {
+            entity.ToTable("PrescriptionItems");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => x.EncounterId);
+            entity.Property(x => x.MedicineName).HasMaxLength(256).IsRequired();
+            entity.Property(x => x.Dose).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Frequency).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Duration).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Instructions).HasMaxLength(1000).IsRequired();
+            entity.HasOne(x => x.Encounter).WithMany(x => x.Prescriptions).HasForeignKey(x => x.EncounterId);
+        });
+
+        modelBuilder.Entity<DoctorOrderEntity>(entity =>
+        {
+            entity.ToTable("DoctorOrders");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => x.EncounterId);
+            entity.Property(x => x.Type).HasConversion<string>().HasMaxLength(32);
+            entity.Property(x => x.TestOrProcedure).HasMaxLength(256).IsRequired();
+            entity.Property(x => x.Notes).HasMaxLength(1000).IsRequired();
+            entity.HasOne(x => x.Encounter).WithMany(x => x.Orders).HasForeignKey(x => x.EncounterId);
         });
     }
 }
@@ -326,4 +383,63 @@ public sealed class BedMovementEntity
     public BedEntity ToBed { get; set; } = null!;
     public DateTime MovedAtUtc { get; set; } = DateTime.UtcNow;
     public string Reason { get; set; } = string.Empty;
+}
+
+public sealed class EncounterEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AppointmentId { get; set; }
+    public Guid PatientId { get; set; }
+    public string PatientName { get; set; } = string.Empty;
+    public DateTime StartedAtUtc { get; set; } = DateTime.UtcNow;
+    public DateTime? CompletedAtUtc { get; set; }
+    public EncounterState State { get; set; } = EncounterState.Open;
+    public string ChiefComplaint { get; set; } = string.Empty;
+    public string Diagnosis { get; set; } = string.Empty;
+    public string ClinicalNotes { get; set; } = string.Empty;
+    public DateOnly? FollowUpDate { get; set; }
+    public string FollowUpAdvice { get; set; } = string.Empty;
+    public Guid? CreatedBy { get; set; }
+    public Guid? UpdatedBy { get; set; }
+    public DateTime? UpdatedAtUtc { get; set; }
+    public byte[] RowVersion { get; set; } = [];
+    public EncounterVitalEntity? Vitals { get; set; }
+    public List<PrescriptionItemEntity> Prescriptions { get; set; } = [];
+    public List<DoctorOrderEntity> Orders { get; set; } = [];
+}
+
+public sealed class EncounterVitalEntity
+{
+    public Guid EncounterId { get; set; }
+    public EncounterEntity Encounter { get; set; } = null!;
+    public decimal? TemperatureC { get; set; }
+    public int? Pulse { get; set; }
+    public int? SystolicBp { get; set; }
+    public int? DiastolicBp { get; set; }
+    public int? RespiratoryRate { get; set; }
+    public decimal? SpO2 { get; set; }
+    public decimal? WeightKg { get; set; }
+    public decimal? HeightCm { get; set; }
+}
+
+public sealed class PrescriptionItemEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid EncounterId { get; set; }
+    public EncounterEntity Encounter { get; set; } = null!;
+    public string MedicineName { get; set; } = string.Empty;
+    public string Dose { get; set; } = string.Empty;
+    public string Frequency { get; set; } = string.Empty;
+    public string Duration { get; set; } = string.Empty;
+    public string Instructions { get; set; } = string.Empty;
+}
+
+public sealed class DoctorOrderEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid EncounterId { get; set; }
+    public EncounterEntity Encounter { get; set; } = null!;
+    public OrderType Type { get; set; }
+    public string TestOrProcedure { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
 }
