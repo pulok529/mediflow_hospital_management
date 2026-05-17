@@ -14,7 +14,7 @@ namespace Mediflow.Api.Controllers;
 
 [ApiController]
 [Route("api/diagnostics")]
-[Authorize(Roles = "SuperAdmin,Admin,LabTech,Doctor")]
+[Authorize(Roles = "SuperAdmin,Admin,LabTech,Radiologist,Doctor")]
 public sealed class DiagnosticsController(IDiagnosticsWorkflowService service) : ControllerBase
 {
     [HttpPost("lab/catalog")]

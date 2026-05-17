@@ -19,7 +19,7 @@
 - Can manage notes, vitals, medication administration, handover
 - Can access transfer/discharge prep list
 
-## Lab Technician / Radiologist
+## LabTech / Radiologist
 - Can manage diagnostics catalog and orders
 - Can collect/enter/approve test outputs per role policy
 - Can generate patient-friendly lab explanation drafts for review
@@ -28,7 +28,7 @@
 - Can manage medicines, batches, stock movement, low-stock alerts
 - Can run inventory demand forecast drafts and review outputs
 
-## Billing Clerk
+## BillingOfficer
 - Can manage bills, payments, refunds, discount workflows
 - Can run billing anomaly detection drafts and complete human review
 

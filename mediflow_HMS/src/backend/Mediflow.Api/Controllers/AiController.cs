@@ -9,7 +9,7 @@ namespace Mediflow.Api.Controllers;
 
 [ApiController]
 [Route("api/ai")]
-[Authorize(Roles = "SuperAdmin,Admin,Doctor,BillingClerk,Pharmacist,LabTechnician,Radiologist,Nurse")]
+[Authorize(Roles = "SuperAdmin,Admin,Doctor,BillingOfficer,Pharmacist,LabTech,Radiologist,Nurse")]
 public sealed class AiController(IAiWorkflowService service) : ControllerBase
 {
     [HttpPost("drafts")]

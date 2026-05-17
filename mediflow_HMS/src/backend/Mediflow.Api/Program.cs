@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Net;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -54,7 +55,8 @@ builder.Services.AddRateLimiter(options =>
         }));
 });
 
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "super-secret-key-change-me";
+var jwtSecret = builder.Configuration["Jwt:Secret"]
+    ?? (builder.Environment.IsDevelopment() ? "super-secret-key-change-me" : throw new InvalidOperationException("JWT secret not configured."));
 var key = Encoding.UTF8.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -83,13 +85,36 @@ var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
-app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Use(async (ctx, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (InvalidOperationException ex)
+    {
+        ctx.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        await ctx.Response.WriteAsJsonAsync(new { error = ex.Message });
+    }
+    catch (ArgumentException ex)
+    {
+        ctx.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        await ctx.Response.WriteAsJsonAsync(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Unhandled request failure");
+        ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        await ctx.Response.WriteAsJsonAsync(new { error = "Unexpected server error." });
+    }
+});
 
 app.Use(async (ctx, next) =>
 {

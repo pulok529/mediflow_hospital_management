@@ -22,7 +22,7 @@ internal sealed class InMemoryIdentityService(ITokenService tokenService, IAudit
 
         var seedRoleNames = new[]
         {
-            "SuperAdmin", "Admin", "Receptionist", "Doctor", "Nurse", "LabTech", "Pharmacist",
+            "SuperAdmin", "Admin", "Receptionist", "Doctor", "Nurse", "LabTech", "Radiologist", "Pharmacist",
             "BillingOfficer", "FloorReceptionist", "AdmissionOfficer"
         };
 
