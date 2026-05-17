@@ -1,0 +1,176 @@
+﻿MEDIFLOW HMS - PROJECT HANDOFF STATUS
+Generated: 2026-05-17 12:52:36 +06:00
+Repository: https://github.com/pulok529/mediflow_hospital_management
+Project folder: Mediflow/mediflow_HMS
+Branch: main
+
+CURRENT SAVED STATE
+- Latest pushed commit: fb8ddf3 Add SQL persistence for nursing IPD care
+- Previous pushed commit: 169d6a0 Add SQL persistence for consultations prescriptions and orders
+- The main project worktree is clean.
+- Unrelated untracked file outside the project remains: ../working_plan/04_Codex_Prompts.zip
+
+WHAT HAS BEEN COMPLETED
+
+1. Repository and project structure
+- Project is organized under Mediflow/mediflow_HMS.
+- Code has been committed and pushed to GitHub multiple times.
+- Docker-based development stack exists and docker compose config validates.
+
+2. Backend foundation
+- ASP.NET backend builds successfully in Release mode.
+- SQL Server persistence is being added through EF Core migrations.
+- Auth/JWT role handling was fixed earlier so role-based API access works with SQL-backed users.
+- Audit logging exists and is used by workflow services.
+
+3. SQL persistence already implemented
+- Identity/users/roles/permissions/refresh tokens.
+- Audit logs.
+- Patients.
+- Appointments and queue state.
+- Admission/facility hierarchy:
+  - Buildings
+  - Floors
+  - Wards
+  - Rooms
+  - Beds
+  - Admissions
+  - Bed movements
+- Consultation/prescription workflow:
+  - Encounters
+  - Encounter vitals
+  - Prescriptions
+  - Doctor lab/radiology orders
+- Nursing/IPD care workflow:
+  - Nursing notes
+  - Medication administration
+  - Vitals schedules and recorded vitals
+  - Intake/output records
+  - Shift handovers
+  - Care alerts
+
+4. Concurrency and locking already implemented
+- Active admission per patient guard.
+- Active bed assignment guard.
+- One open encounter per appointment guard.
+- Completed consultation/encounter lock.
+- Medication cannot be administered twice.
+- Vitals schedule cannot be recorded twice.
+- RowVersion columns exist for several critical mutable records.
+
+5. EF migrations currently applied/listed
+- 20260517002351_InitialPersistenceSlice
+- 20260517061418_AdmissionBedPersistence
+- 20260517063141_ConsultationPrescriptionPersistence
+- 20260517064322_NursingIpdPersistence
+
+6. Verification completed
+- Backend Release build passed.
+- Frontend production build passed.
+- Docker compose config passed.
+- EF migration list validation passed locally.
+- Consultation SQL smoke test passed:
+  - Create patient
+  - Create appointment
+  - Start encounter
+  - Save prescriptions/orders
+  - Complete encounter
+  - Verify completed encounter lock returns 400
+  - Verify patient consultation history
+- Nursing/IPD SQL smoke test passed:
+  - Create patient/admission
+  - Add nursing note
+  - Add medication
+  - Administer medication
+  - Verify duplicate administration lock returns 400
+  - Schedule vitals
+  - Record vitals
+  - Verify duplicate vitals recording lock returns 400
+  - Add intake/output
+  - Add handover
+  - Verify alerts generated
+
+WHAT IS REMAINING TO COMPLETE THE CURRENT SQL-PERSISTENCE PHASE
+
+1. Diagnostics/lab/radiology SQL persistence
+- Replace in-memory diagnostics workflow with SQL-backed service.
+- Persist lab orders, lab samples, lab results, approvals, radiology reports, and approval/review states.
+- Add migration.
+- Add approval locking so finalized/approved diagnostic reports cannot be silently edited.
+- Smoke test diagnostics workflow through API.
+
+2. Pharmacy/inventory/stock ledger SQL persistence
+- Replace in-memory pharmacy workflow with SQL-backed service.
+- Persist medicines/items, batches, stock movements, dispensing, returns, expiry data, and stock ledger entries.
+- Add stock ledger integrity rules.
+- Prevent negative stock and inconsistent ledger updates.
+- Add migration and smoke tests.
+
+3. Billing/discharge SQL persistence
+- Replace in-memory billing/discharge workflow with SQL-backed service.
+- Persist invoices, bill line items, payments, refunds, deposits, final bill state, discharge clearance, and discharge summary.
+- Add final bill locking so finalized bills cannot be edited without a correction/reversal workflow.
+- Add migration and smoke tests.
+
+4. AI request/approval history SQL persistence
+- Persist AI requests, generated suggestions, reviewer approvals/rejections, timestamps, actor IDs, and final decision history.
+- Ensure AI output is never treated as final clinical data without explicit approval.
+- Add migration and smoke tests.
+
+5. More seed data
+Needed seed data includes:
+- Departments
+- Services/procedures
+- Doctors and staff users by role
+- Beds/floors/wards/rooms with realistic hospital layout
+- Payment methods
+- Report templates
+- Pharmacy medicines and starter stock
+- Lab/radiology test catalog
+- Billing service catalog
+
+6. More concurrency/production rules
+Remaining important guards include:
+- Lab approval locking.
+- Radiology report approval locking.
+- Pharmacy stock ledger transaction integrity.
+- Billing finalization locking.
+- Discharge approval locking.
+- Revision/correction workflows for finalized records.
+- Better handling of EF DbUpdateConcurrencyException into clean API responses.
+
+7. Migration validation in CI
+- Add CI step to build backend.
+- Add CI step to validate EF migrations.
+- Add CI step to run frontend build.
+- Optionally add test SQL Server service in CI and apply migrations against a real database.
+
+8. Productization work still needed beyond persistence
+- Automated tests for workflow services and controllers.
+- Stronger validation rules for clinical/billing/pharmacy inputs.
+- Better error responses and API consistency.
+- Role-specific UI polish and workflow testing.
+- Production environment configuration and secret management.
+- Backup/restore plan.
+- Deployment pipeline.
+- Security hardening.
+- Audit/reporting exports.
+- Performance review for large patient/order/billing data.
+- Real hospital pilot feedback and rule customization.
+
+NEXT RECOMMENDED STEP WHEN WE CONTINUE
+1. Start Diagnostics/lab/radiology SQL persistence.
+2. Read current diagnostics interface, controller, contracts, and in-memory service.
+3. Add SQL entities and DbSets for lab/radiology workflow.
+4. Implement DatabaseDiagnosticsWorkflowService.
+5. Generate and apply migration.
+6. Smoke test diagnostics order/result/approval flow.
+7. Commit and push.
+
+IMPORTANT NOTES
+- Use SQL Server connection locally:
+  Server=localhost,1433;Database=MediflowDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+- Superadmin login used in smoke tests:
+  Email: superadmin@mediflow.local
+  Password: SuperAdmin123!
+- The EF tools warning about version 8.0.0 vs runtime 10.0.8 appears during migration commands. It did not block migration creation/application, but updating local dotnet-ef later would be cleaner.
