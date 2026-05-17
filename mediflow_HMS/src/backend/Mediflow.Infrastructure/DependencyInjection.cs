@@ -40,7 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, DatabaseIdentityService>();
         services.AddScoped<IPatientWorkflowService, DatabasePatientWorkflowService>();
         services.AddScoped<IConsultationWorkflowService, InMemoryConsultationWorkflowService>();
-        services.AddScoped<IAdmissionWorkflowService, InMemoryAdmissionWorkflowService>();
+        services.AddScoped<IAdmissionWorkflowService, DatabaseAdmissionWorkflowService>();
         services.AddScoped<INursingWorkflowService, InMemoryNursingWorkflowService>();
         services.AddScoped<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
         services.AddScoped<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
