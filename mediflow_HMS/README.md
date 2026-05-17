@@ -49,6 +49,7 @@ This folder contains the initial production-grade foundation for Mediflow Hospit
 - CI/CD examples: `.github/workflows/ci.yml`, `.github/workflows/cd-example.yml`
 - Deployment docs:
   - `docs/deployment/environment-strategy.md`
+  - `docs/deployment/database-persistence.md`
   - `docs/deployment/production-configuration.md`
   - `docs/deployment/logging-monitoring.md`
   - `docs/deployment/secret-management.md`

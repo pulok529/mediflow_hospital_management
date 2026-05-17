@@ -33,7 +33,7 @@ builder.Services
     .AddFluentValidationAutoValidation()
     .AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpClient("ai-service", client =>
 {
     var baseUrl = builder.Configuration["AiService:BaseUrl"] ?? "http://localhost:8090";
@@ -131,8 +131,9 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-RecurringJob.AddOrUpdate<ReminderJobs>("queue-reminder", x => x.SendQueueReminder(), "*/5 * * * *");
-RecurringJob.AddOrUpdate<ReminderJobs>("discharge-reminder", x => x.SendDischargeReminder(), "*/10 * * * *");
+var recurringJobs = app.Services.GetRequiredService<IRecurringJobManager>();
+recurringJobs.AddOrUpdate<ReminderJobs>("queue-reminder", x => x.SendQueueReminder(), "*/5 * * * *");
+recurringJobs.AddOrUpdate<ReminderJobs>("discharge-reminder", x => x.SendDischargeReminder(), "*/10 * * * *");
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapHealthChecks("/healthz");

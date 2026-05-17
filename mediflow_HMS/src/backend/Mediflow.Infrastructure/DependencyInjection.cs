@@ -19,29 +19,35 @@ using Mediflow.Infrastructure.Diagnostics;
 using Mediflow.Infrastructure.Identity;
 using Mediflow.Infrastructure.Nursing;
 using Mediflow.Infrastructure.Patient;
+using Mediflow.Infrastructure.Persistence;
 using Mediflow.Infrastructure.Pharmacy;
 using Mediflow.Infrastructure.Reporting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediflow.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IAuditLogService, InMemoryAuditLogService>();
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+
+        services.AddScoped<IAuditLogService, DatabaseAuditLogService>();
         services.AddScoped<ITokenService, JwtTokenService>();
-        services.AddSingleton<IIdentityService, InMemoryIdentityService>();
-        services.AddSingleton<IPatientWorkflowService, InMemoryPatientWorkflowService>();
-        services.AddSingleton<IConsultationWorkflowService, InMemoryConsultationWorkflowService>();
-        services.AddSingleton<IAdmissionWorkflowService, InMemoryAdmissionWorkflowService>();
-        services.AddSingleton<INursingWorkflowService, InMemoryNursingWorkflowService>();
-        services.AddSingleton<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
-        services.AddSingleton<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
-        services.AddSingleton<IBillingWorkflowService, InMemoryBillingWorkflowService>();
-        services.AddSingleton<IReportingService, InMemoryReportingService>();
-        services.AddSingleton<IExternalReportBridge, ExternalReportBridge>();
-        services.AddSingleton<IAiWorkflowService, FastApiAiWorkflowService>();
+        services.AddScoped<IIdentityService, DatabaseIdentityService>();
+        services.AddScoped<IPatientWorkflowService, DatabasePatientWorkflowService>();
+        services.AddScoped<IConsultationWorkflowService, InMemoryConsultationWorkflowService>();
+        services.AddScoped<IAdmissionWorkflowService, InMemoryAdmissionWorkflowService>();
+        services.AddScoped<INursingWorkflowService, InMemoryNursingWorkflowService>();
+        services.AddScoped<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
+        services.AddScoped<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
+        services.AddScoped<IBillingWorkflowService, InMemoryBillingWorkflowService>();
+        services.AddScoped<IReportingService, InMemoryReportingService>();
+        services.AddScoped<IExternalReportBridge, ExternalReportBridge>();
+        services.AddScoped<IAiWorkflowService, FastApiAiWorkflowService>();
         return services;
     }
 }
