@@ -41,7 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IPatientWorkflowService, DatabasePatientWorkflowService>();
         services.AddScoped<IConsultationWorkflowService, DatabaseConsultationWorkflowService>();
         services.AddScoped<IAdmissionWorkflowService, DatabaseAdmissionWorkflowService>();
-        services.AddScoped<INursingWorkflowService, InMemoryNursingWorkflowService>();
+        services.AddScoped<INursingWorkflowService, DatabaseNursingWorkflowService>();
         services.AddScoped<IDiagnosticsWorkflowService, InMemoryDiagnosticsWorkflowService>();
         services.AddScoped<IPharmacyInventoryService, InMemoryPharmacyInventoryService>();
         services.AddScoped<IBillingWorkflowService, InMemoryBillingWorkflowService>();

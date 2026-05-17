@@ -1,6 +1,7 @@
 using Mediflow.Application.Abstractions.Patient;
 using Mediflow.Application.Abstractions.Admission;
 using Mediflow.Application.Abstractions.Consultation;
+using Mediflow.Application.Abstractions.Nursing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mediflow.Infrastructure.Persistence;
@@ -25,6 +26,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<EncounterVitalEntity> EncounterVitals => Set<EncounterVitalEntity>();
     public DbSet<PrescriptionItemEntity> PrescriptionItems => Set<PrescriptionItemEntity>();
     public DbSet<DoctorOrderEntity> DoctorOrders => Set<DoctorOrderEntity>();
+    public DbSet<NursingNoteEntity> NursingNotes => Set<NursingNoteEntity>();
+    public DbSet<MedicationAdministrationEntity> MedicationAdministrations => Set<MedicationAdministrationEntity>();
+    public DbSet<VitalsScheduleEntity> VitalsSchedules => Set<VitalsScheduleEntity>();
+    public DbSet<IntakeOutputEntity> IntakeOutputs => Set<IntakeOutputEntity>();
+    public DbSet<ShiftHandoverEntity> ShiftHandovers => Set<ShiftHandoverEntity>();
+    public DbSet<CareAlertEntity> CareAlerts => Set<CareAlertEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -228,6 +235,75 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(x => x.TestOrProcedure).HasMaxLength(256).IsRequired();
             entity.Property(x => x.Notes).HasMaxLength(1000).IsRequired();
             entity.HasOne(x => x.Encounter).WithMany(x => x.Orders).HasForeignKey(x => x.EncounterId);
+        });
+
+        modelBuilder.Entity<NursingNoteEntity>(entity =>
+        {
+            entity.ToTable("NursingNotes");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.AdmissionId, x.AtUtc });
+            entity.Property(x => x.NurseName).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Note).HasMaxLength(4000).IsRequired();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
+            entity.HasOne(x => x.LinkedDoctorRoundEncounter).WithMany().HasForeignKey(x => x.LinkedDoctorRoundEncounterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MedicationAdministrationEntity>(entity =>
+        {
+            entity.ToTable("MedicationAdministrations");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.Status, x.DueAtUtc });
+            entity.HasIndex(x => x.AdmissionId);
+            entity.Property(x => x.MedicationName).HasMaxLength(256).IsRequired();
+            entity.Property(x => x.Dose).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Status).HasConversion<string>().HasMaxLength(32);
+            entity.Property(x => x.Remarks).HasMaxLength(1000);
+            entity.Property(x => x.RowVersion).IsRowVersion();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
+        });
+
+        modelBuilder.Entity<VitalsScheduleEntity>(entity =>
+        {
+            entity.ToTable("VitalsSchedules");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.AdmissionId, x.DueAtUtc });
+            entity.Property(x => x.TemperatureC).HasPrecision(5, 2);
+            entity.Property(x => x.SpO2).HasPrecision(5, 2);
+            entity.Property(x => x.RowVersion).IsRowVersion();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
+        });
+
+        modelBuilder.Entity<IntakeOutputEntity>(entity =>
+        {
+            entity.ToTable("IntakeOutputs");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.AdmissionId, x.AtUtc });
+            entity.Property(x => x.IntakeMl).HasPrecision(10, 2);
+            entity.Property(x => x.OutputMl).HasPrecision(10, 2);
+            entity.Property(x => x.Notes).HasMaxLength(1000).IsRequired();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
+        });
+
+        modelBuilder.Entity<ShiftHandoverEntity>(entity =>
+        {
+            entity.ToTable("ShiftHandovers");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.AdmissionId, x.AtUtc });
+            entity.Property(x => x.FromShift).HasMaxLength(64).IsRequired();
+            entity.Property(x => x.ToShift).HasMaxLength(64).IsRequired();
+            entity.Property(x => x.Summary).HasMaxLength(4000).IsRequired();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
+        });
+
+        modelBuilder.Entity<CareAlertEntity>(entity =>
+        {
+            entity.ToTable("CareAlerts");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.Resolved, x.AtUtc });
+            entity.HasIndex(x => x.AdmissionId);
+            entity.Property(x => x.Severity).HasConversion<string>().HasMaxLength(32);
+            entity.Property(x => x.Message).HasMaxLength(1000).IsRequired();
+            entity.HasOne(x => x.Admission).WithMany().HasForeignKey(x => x.AdmissionId);
         });
     }
 }
@@ -442,4 +518,85 @@ public sealed class DoctorOrderEntity
     public OrderType Type { get; set; }
     public string TestOrProcedure { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
+}
+
+public sealed class NursingNoteEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public DateTime AtUtc { get; set; } = DateTime.UtcNow;
+    public string NurseName { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
+    public Guid? LinkedDoctorRoundEncounterId { get; set; }
+    public EncounterEntity? LinkedDoctorRoundEncounter { get; set; }
+    public Guid? CreatedBy { get; set; }
+}
+
+public sealed class MedicationAdministrationEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public string MedicationName { get; set; } = string.Empty;
+    public string Dose { get; set; } = string.Empty;
+    public DateTime DueAtUtc { get; set; }
+    public DateTime? AdministeredAtUtc { get; set; }
+    public MedicationStatus Status { get; set; } = MedicationStatus.Due;
+    public string? Remarks { get; set; }
+    public Guid? CreatedBy { get; set; }
+    public Guid? AdministeredBy { get; set; }
+    public byte[] RowVersion { get; set; } = [];
+}
+
+public sealed class VitalsScheduleEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public DateTime DueAtUtc { get; set; }
+    public decimal? TemperatureC { get; set; }
+    public int? Pulse { get; set; }
+    public int? SystolicBp { get; set; }
+    public int? DiastolicBp { get; set; }
+    public decimal? SpO2 { get; set; }
+    public bool Recorded { get; set; }
+    public Guid? CreatedBy { get; set; }
+    public Guid? RecordedBy { get; set; }
+    public byte[] RowVersion { get; set; } = [];
+}
+
+public sealed class IntakeOutputEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public DateTime AtUtc { get; set; } = DateTime.UtcNow;
+    public decimal IntakeMl { get; set; }
+    public decimal OutputMl { get; set; }
+    public string Notes { get; set; } = string.Empty;
+    public Guid? CreatedBy { get; set; }
+}
+
+public sealed class ShiftHandoverEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public DateTime AtUtc { get; set; } = DateTime.UtcNow;
+    public string FromShift { get; set; } = string.Empty;
+    public string ToShift { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
+    public Guid? CreatedBy { get; set; }
+}
+
+public sealed class CareAlertEntity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AdmissionId { get; set; }
+    public AdmissionEntity Admission { get; set; } = null!;
+    public AlertSeverity Severity { get; set; } = AlertSeverity.Info;
+    public string Message { get; set; } = string.Empty;
+    public DateTime AtUtc { get; set; } = DateTime.UtcNow;
+    public bool Resolved { get; set; }
 }

@@ -40,8 +40,15 @@ public sealed class NursingController(INursingWorkflowService service) : Control
     [HttpPut("medications/{medicationId:guid}/administer")]
     public IActionResult Administer(Guid medicationId, [FromBody] ApiAdministerMedicationRequest request)
     {
-        var updated = service.AdministerMedication(medicationId, new(request.Remarks), ParseActorId(User));
-        return updated is null ? NotFound() : Ok(updated);
+        try
+        {
+            var updated = service.AdministerMedication(medicationId, new(request.Remarks), ParseActorId(User));
+            return updated is null ? NotFound() : Ok(updated);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("medications/due")]
@@ -54,8 +61,15 @@ public sealed class NursingController(INursingWorkflowService service) : Control
     [HttpPut("vitals/{vitalsScheduleId:guid}/record")]
     public IActionResult RecordVitals(Guid vitalsScheduleId, [FromBody] ApiRecordVitalsRequest request)
     {
-        var recorded = service.RecordVitals(vitalsScheduleId, new(request.TemperatureC, request.Pulse, request.SystolicBp, request.DiastolicBp, request.SpO2), ParseActorId(User));
-        return recorded is null ? NotFound() : Ok(recorded);
+        try
+        {
+            var recorded = service.RecordVitals(vitalsScheduleId, new(request.TemperatureC, request.Pulse, request.SystolicBp, request.DiastolicBp, request.SpO2), ParseActorId(User));
+            return recorded is null ? NotFound() : Ok(recorded);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("vitals/{admissionId:guid}")]
